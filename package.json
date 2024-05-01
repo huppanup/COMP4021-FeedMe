@@ -9,7 +9,6 @@
     "socket.io": "^4.7.5"
   },
   "scripts": {
-    "start": "./node_modules/.bin/nodemon chat_server.js",
-    "test" : "./node_modules/.bin/nodemon eatme_server.js"
+    "start": "./node_modules/.bin/nodemon feedme_server.js"
   }
 }
