@@ -34,6 +34,18 @@ If you don't want to use nodemon, you can use the standard command.
   node feedme_server.js
 ```
 
+## Where to start?
+The game page is located under `views/game.ejs`, which is rendered through
+
+```
+app.get('/game', (req, res) => {
+    res.render("game");
+})
+```
+in `feedme_server.js`. The lobby code will probably be added to the path (e.g. /game/EGXQ) but idk yet, but you can start writing the html for the gamein that file.
+
+You can access the page on [localhost:3000/game](localhost:3000/game).
+
 ## Current progress
 
 UI of login page(WIP)
