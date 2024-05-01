@@ -27,9 +27,15 @@ Use the following command to start the webpage on [localhost:3000](localhost:300
 ```
 which automatically runs the following script.
 ```
-  ./node_modules/.bin/nodemon eatme_server.js
+  ./node_modules/.bin/nodemon feedme_server.js
 ```
 If you don't want to use nodemon, you can use the standard command.
 ```
   node feedme_server.js
 ```
+
+## Current progress
+
+UI of login page(WIP)
+
+![FeedMe Login Page](./public/resources/loginpage_sample.png)
