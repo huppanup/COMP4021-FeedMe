@@ -57,6 +57,38 @@ app.get('/game', (req, res) => {
     res.render("game");
 })
 
+// POST
+app.post("/signin", (req, res) => {
+    const { id, password } = req.body;
+    console.log(req.body)
+
+    const users = JSON.parse(fs.readFileSync("data/users.json"));
+    if (! (id in users)) return res.json({status : "error", error : `Error : User ID does not exist.`});
+
+    const hashedPassword = users[id].password;
+    if (!bcrypt.compareSync(password, hashedPassword)) return res.json({status : "error", error : `Error : Incorrect password.`});
+
+    const userInfo = {id : id, scores : users[id].scores };
+    req.session.user = userInfo;
+    res.json({ status: "success", user : userInfo});
+});
+
+app.post("/register", (req, res) => {
+    const { id, password } = req.body;
+
+    const users = JSON.parse(fs.readFileSync("data/users.json"));
+
+    if (!containWordCharsOnly(id)) return res.json({status : "error", error :"Error : Your ID should only contain underscores, letters or numbers."});
+    if (id in users) return res.json({status : "error", error : `Error : The ID '${id}' already exists in the system.`});
+
+    const hash = bcrypt.hashSync(password, 10);
+    users[id] = {password : hash, scores : []};
+
+    fs.writeFileSync("data/users.json",JSON.stringify(users, null, " " ))
+
+    return res.json({ status: "success" });
+});
+
 
 // Use a web server to listen at port 8000
 httpServer.listen(3000, '0.0.0.0', () => {

@@ -51,3 +51,11 @@ You can access the page on [localhost:3000/game](localhost:3000/game).
 UI of login page(WIP)
 
 ![FeedMe Login Page](./public/resources/loginpage_sample.png)
+
+Backend for login/signup completed
+
+Remaining Tasks(연우)
+1. User session
+2. Logout/delete account(?)
+3. Enter/Create lobby overlay
+4. Game lobby screen

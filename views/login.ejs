@@ -10,24 +10,25 @@
     <div id="container" class="col"> 
     </div>
     <div id="signin-overlay" class="overlay row">
-        <div class="content shadow row">
+        <div class="content shadow">
         <img id="overlay-title" src="resources/feed_me.svg" width="300px"/>
-        <form id="signin-form" class="col">
-            <label name="userid">User ID</label>
-            <input id="signin-userid" name="userid" placeholder="User ID"></input>
-            <label name="password">Password</label>
-            <input id="signin-password" type="password" name="password" placeholder="Password"></input>
-            <button type="submit">Sign In</button>
+        <form id="signin-form">
+            <div class="form-title">SIGN IN</div>
         </form>
         <div class="spacer-vline"></div>
-        <form id="register-form" class="col">
-            <label name="userid">User ID</label>
-            <input id="register-userid" name="userid" placeholder="User ID"></input>
-            <label name="password">Password</label>
-            <input id="register-password" type="password" name="password" placeholder="Password"></input>
-            <button type="submit">Register</button>
+        <form id="register-form">
+            <div class="form-title">REGISTER</div>
+
         </form>
         </div>
-    </div>     
+    </div>
+    <script src="scripts/login.js"></script>
+    <script src="scripts/authentication.js"></script>
+    <script>
+        $(function() {
+            // Initialize the UI
+            SignInForm.initialize();
+        });
+        </script>
 </body>
 </html>
