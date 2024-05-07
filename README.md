@@ -16,7 +16,7 @@ You need to install the following packages to run this project.
     
 (Note: Nodemon is only used to help development, it automatically restarts if the server is changed!)
 
-Install them using the `npm i` command (e.g. `npm i bcrypt`)
+Install them using the `npm i` command (e.g. `npm i bcrypt` if you want to install only bcrypt, just `npm i` to install all packages)
 
 ## Running the project
 
