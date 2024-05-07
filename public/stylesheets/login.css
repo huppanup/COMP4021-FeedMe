@@ -81,6 +81,10 @@ body {
 }
 .spacer-grow { flex-grow: 1; }
 
+.center-content{
+    align-self: center;
+}
+
 /* Overlay */
 .overlay {
     display: flex;
@@ -149,10 +153,10 @@ form label{
 }
 
 
-form input, form select, form label{
+form input:not([type="radio"]), form select, form label{
     width: 100%;
 }
-input, select {
+input:not([type="radio"]), select {
     font-size: 1rem;
     background: white;
     border: 2px solid var(--overlay-border);
@@ -166,6 +170,12 @@ input::placeholder, select {
 
 .form-shadow{
    box-shadow: 0px 4px 0px 0px var(--overlay-caption-color);
+}
+
+.options{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
 
 button {

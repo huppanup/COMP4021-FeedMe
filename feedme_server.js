@@ -64,7 +64,6 @@ app.get('/game', (req, res) => {
 // POST
 app.post("/signin", (req, res) => {
     const { id, password } = req.body;
-    console.log(req.body)
 
     const users = JSON.parse(fs.readFileSync("data/users.json"));
     if (! (id in users)) return res.json({status : "error", error : `Error : User ID does not exist.`});

@@ -28,6 +28,8 @@ const SignInForm = (function() {
             () => {
                 hide();
                 Socket.connect();
+                LobbyForm.show();
+                // Redirect should not happen here! Will be changed.
                 window.location.href = "/game";
             },
             (error) => { clear(); $("#signin-message").text(error); }
@@ -71,12 +73,37 @@ const SignInForm = (function() {
     };
 
     const show = function() {
-        $("#signin-overlay").fadIn(500);
+        $("#signin-overlay").fadeIn(500);
     };
 
     const generateInput = function(name, label, placeholder, type = 'text'){
         return `<div class="form-entry"><label for="${name}">${label}</label>
         <input type=${type} id="${name}" name="${name}" placeholder="${placeholder}" required/></div>`
     }
+    return {initialize, hide, show}
+})();
+
+const LobbyForm = (function() {
+    // This function initializes the UI
+    const initialize = function() {
+    };
+
+    const clear = function() {
+        $("#create-form").get(0).reset();
+        $("#enter-form").get(0).reset();
+        $("#create-message").text("");
+        $("#enter-message").text("");
+    }
+
+    const hide = function() {
+        clear();
+        $("#enterlobby-overlay").fadeOut(500);
+    };
+
+    const show = function() {
+        console.log("lobby overlay fade in");
+        $("#enterlobby-overlay").fadeIn(500);
+    };
+
     return {initialize, hide, show}
 })();

@@ -48,16 +48,20 @@ You can access the page on [localhost:3000/game](localhost:3000/game).
 
 ## Current progress
 
-UI of login page(WIP)
+Login/SignUp UI
 
 ![FeedMe Login Page](./public/resources/loginpage_sample.png)
+
+Enter/Create lobby UI
+![FeedMe Enter Lobby Page](./public/resources/enterlobby_sample.png)
 
 Completed Tasks
 1. Login/Signup UI
 2. Backend for login/signup
 3. User session (websocket)
+4. Enter/Create lobby overlay UI
 
 Remaining Tasks(연우)
 1. Logout/delete account(?)
-2. Enter/Create lobby overlay
+2. Enter/Create lobby backend
 3. Game lobby screen
