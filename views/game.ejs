@@ -8,20 +8,154 @@
 </head>
 <body>
     <div id="container" class="col">
-    </div>
-    <div id="signin-overlay" class="overlay row">
+        <canvas id="game-area" width="854" height="480"></canvas>
+
+        <!-- Game Start Countdown -->
+        <div id="game-start" class="center start-text">
+            <h1 id="countdown">Game Start!</h1>
         </div>
+
+        <!-- Game Over Text -->
+        <div id="game-over" class="center end-text hidden">
+            <h1>Game Over</h1>
+        </div>
+
+        <!-- Results Table -->
+        <div id="results-box" class="center results-text hidden">
+            <h2>Results</h2>
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Results will be populated dynamically -->
+                </tbody>
+            </table>
+            <h3 id="winner-text">Winner: </h3>
+            <button id="restart-game">Restart</button>
+        </div>
+
+        <!-- Timer -->
+        <div id="timer-box" class="right-top timer-text hidden">
+            <span id="timer">Time: 60</span>
+        </div>
+
     </div>
+    <div id="signin-overlay" class="overlay row"></div>
 
-
-    <script>
-        // user defined
-       const user = {
-           name: '<?= $user->name ?>',
-           id: '<?= $user->id ?>',
-           socketId: '<?= $user->socket_id ?>'
-       };
-    </script>
     <script src="/scripts/game.js"></script>
+    <script>
+        // User-defined
+        const user = {
+            name: '<?= $user->name ?>',
+            id: '<?= $user->id ?>',
+            socketId: '<?= $user->socket_id ?>'
+        };
+
+        // Placeholder for other users' scores
+        const otherUsers = [
+            { name: 'Player 1', score: 45 },
+            { name: 'Player 2', score: 52 },
+            { name: 'Player 3', score: 38 },
+        ];
+
+        // Current user's score
+        let currentUserScore = 60;
+
+        $(document).ready(function () {
+            startCountdown();
+            $('#restart-game').click(function () {
+                $('#results-box').addClass('hidden');
+                $('#game-over').addClass('hidden');
+                $('#timer-box').removeClass('hidden');
+                $('#game-area').show();
+                startCountdown();
+            });
+        });
+
+        function startCountdown() {
+            const countdownElem = $('#countdown');
+            let countdown = 3;
+
+            countdownElem.text(countdown);
+            $('#game-start').show();
+            $('#timer-box').addClass('hidden');
+            $('#game-over').addClass('hidden');
+            $('#results-box').addClass('hidden');
+            $('#game-area').hide();
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    countdownElem.text(countdown);
+                } else {
+                    countdownElem.text("Game Start!");
+                }
+
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    $('#game-start').hide();
+                    $('#timer-box').removeClass('hidden');
+                    $('#game-area').show();
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function startGame() {
+            let timeLeft = 10;
+            $('#timer').text('Time: ' + timeLeft);
+
+            const gameInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    endGame();
+                } else {
+                    timeLeft--;
+                    $('#timer').text('Time: ' + timeLeft);
+                }
+            }, 1000);
+        }
+
+        function endGame() {
+            $('#game-over').removeClass('hidden');
+            $('#timer-box').addClass('hidden');
+            $('#game-area').hide();
+
+            setTimeout(() => {
+                $('#game-over').addClass('hidden');
+                showResults();
+            }, 2000);
+        }
+
+        function showResults() {
+            // Combine current user and other users
+            const results = [...otherUsers, { name: user.name, score: currentUserScore }];
+
+            // Sort by score descending
+            results.sort((a, b) => b.score - a.score);
+
+            // Populate the results table
+            const resultsTableBody = $('#results-table tbody');
+            resultsTableBody.empty();
+            results.forEach(player => {
+                resultsTableBody.append(`
+                    <tr>
+                        <td>${player.name}</td>
+                        <td>${player.score}</td>
+                    </tr>
+                `);
+            });
+
+            // Determine the winner
+            const winner = results[0].name;
+            $('#winner-text').text(`Winner: ${winner}`);
+
+            $('#results-box').removeClass('hidden');
+        }
+    </script>
 </body>
 </html>
