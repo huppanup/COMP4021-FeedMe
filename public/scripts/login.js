@@ -28,6 +28,7 @@ const SignInForm = (function() {
             () => {
                 hide();
                 Socket.connect();
+                window.location.href = "/game";
             },
             (error) => { clear(); $("#signin-message").text(error); }
         );

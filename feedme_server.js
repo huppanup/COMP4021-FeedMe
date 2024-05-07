@@ -54,7 +54,11 @@ app.get('/', (req, res) => {
 })
 
 app.get('/game', (req, res) => {
-    res.render("game");
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
+    res.render("game", {user : req.session.user});
 })
 
 // POST
@@ -121,7 +125,7 @@ io.on("connection", (socket) => {
 });
 
 
-// Use a web server to listen at port 8000
+// Use a web server to listen at port 3000
 httpServer.listen(3000, '0.0.0.0', () => {
     console.log("The chat server has started...");
 });

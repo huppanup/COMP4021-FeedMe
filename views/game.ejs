@@ -1,9 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Welcome!</title>
+    <meta charset="UTF-8">
+    <title> Welcome! </title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="/stylesheets/game.css" rel="stylesheet">
 </head>
 <body>
-<%= "Game page" %>
+    <div id="container" class="col">
+    </div>
+    <div id="signin-overlay" class="overlay row">
+        </div>
+    </div>
+
+
+    <script>
+        // user defined
+       const user = {
+           name: '<?= $user->name ?>',
+           id: '<?= $user->id ?>',
+           socketId: '<?= $user->socket_id ?>'
+       };
+    </script>
+    <script src="/scripts/game.js"></script>
 </body>
 </html>
