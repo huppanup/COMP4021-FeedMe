@@ -41,5 +41,35 @@ const Authentication = (function() {
         });
     }
 
-    return { getUser, signin, register };
+    const validate = function(onSuccess, onError) {
+        fetch("/validate")
+        .then((res) => res.json() )
+        .then((json) => {
+            if (json.status == "error") { onError(json.error)}
+            else if (json.status == "success") {
+                user = json.user; 
+                onSuccess();
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log("Error!");
+        });
+    };
+
+    const signout = function(onSuccess, onError) {
+        fetch("/signout")
+        .then((res) => res.json() )
+        .then((json) => {
+            if (json.status == "success") {
+                user = null; 
+                onSuccess();
+            }
+        })
+        .catch((err) => {
+            console.log("Error!");
+        });
+    };
+
+    return { getUser, signin, register, validate, signout };
 })();

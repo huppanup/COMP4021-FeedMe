@@ -89,6 +89,37 @@ app.post("/register", (req, res) => {
     return res.json({ status: "success" });
 });
 
+// GET
+
+app.get("/validate", (req, res) => {
+
+    const user = req.session.user;
+
+    if (!user) return res.json({status : "error", error : "Error : User validation failed"})
+    
+    return res.json({ status: "success", user : user})
+});
+
+// Handle the /signout endpoint
+app.get("/signout", (req, res) => {
+
+    delete req.session.user;
+
+    res.json({ status : "success"});
+});
+
+// WebSocket
+// Handle Websocket
+io.on("connection", (socket) => {
+    const user = socket.request.session.user;
+
+    socket.on("disconnect", () => {
+        const user = socket.request.session.user;
+        io.emit("remove user", JSON.stringify({username: user.username, avatar : user.avatar, name : user.name}));
+    })
+    
+});
+
 
 // Use a web server to listen at port 8000
 httpServer.listen(3000, '0.0.0.0', () => {

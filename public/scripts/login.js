@@ -27,7 +27,7 @@ const SignInForm = (function() {
         Authentication.signin(username, password,
             () => {
                 hide();
-                //Socket.connect();
+                Socket.connect();
             },
             (error) => { clear(); $("#signin-message").text(error); }
         );
@@ -43,7 +43,6 @@ const SignInForm = (function() {
         const confirmpw = $('#register-confirmpw').val().trim();
 
         if (password != confirmpw) {
-            console.log("PW do not match")
             $("#register-message").text("Passwords do not match.");
             return;
         }
@@ -51,8 +50,8 @@ const SignInForm = (function() {
         // Send a signin request
         Authentication.register(id, password,
             () => {
-                hide();
-                //Socket.connect();
+                clear();
+                $("#register-message").text("You can sign in now.");
             },
             (error) => { clear(); $("#register-message").text(error); }
         );
@@ -70,9 +69,13 @@ const SignInForm = (function() {
         $("#signin-overlay").fadeOut(500);
     };
 
+    const show = function() {
+        $("#signin-overlay").fadIn(500);
+    };
+
     const generateInput = function(name, label, placeholder, type = 'text'){
         return `<div class="form-entry"><label for="${name}">${label}</label>
         <input type=${type} id="${name}" name="${name}" placeholder="${placeholder}" required/></div>`
     }
-    return {initialize}
+    return {initialize, hide, show}
 })();

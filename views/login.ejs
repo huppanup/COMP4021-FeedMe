@@ -22,12 +22,24 @@
         </form>
         </div>
     </div>
+
+    <script src="/socket.io/socket.io.min.js"></script>
     <script src="scripts/login.js"></script>
     <script src="scripts/authentication.js"></script>
+    <script src="scripts/socket.js"></script>
+
     <script>
         $(function() {
-            // Initialize the UI
             SignInForm.initialize();
+            Authentication.validate(
+                () => {
+                    SignInForm.hide();
+                    Socket.connect();
+                },
+                () => {
+                    SignInForm.show();
+                }
+            );
         });
         </script>
 </body>

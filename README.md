@@ -52,10 +52,12 @@ UI of login page(WIP)
 
 ![FeedMe Login Page](./public/resources/loginpage_sample.png)
 
-Backend for login/signup completed
+Completed Tasks
+1. Login/Signup UI
+2. Backend for login/signup
+3. User session (websocket)
 
 Remaining Tasks(연우)
-1. User session
-2. Logout/delete account(?)
-3. Enter/Create lobby overlay
-4. Game lobby screen
+1. Logout/delete account(?)
+2. Enter/Create lobby overlay
+3. Game lobby screen
