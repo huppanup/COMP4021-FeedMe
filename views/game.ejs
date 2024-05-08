@@ -8,20 +8,271 @@
 </head>
 <body>
     <div id="container" class="col">
-    </div>
-    <div id="signin-overlay" class="overlay row">
-        </div>
-    </div>
+        <canvas id="game-area" width="854" height="480"></canvas>
 
+        <!-- Game Start Countdown -->
+        <div id="game-start" class="center start-text">
+            <h1 id="countdown">Game Start!</h1>
+        </div>
+
+        <!-- Game Over Text -->
+        <div id="game-over" class="center end-text hidden">
+            <h1>Game Over</h1>
+        </div>
+
+        <!-- Results Table -->
+        <div id="results-box" class="center results-text hidden">
+            <h2>Results</h2>
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Results will be populated dynamically -->
+                </tbody>
+            </table>
+            <h3 id="winner-text">Winner: </h3>
+            <button id="restart-game">Restart</button>
+        </div>
+
+        <!-- Timer -->
+        <div id="timer-box" class="right-top timer-text hidden">
+            <span id="timer">Time: 60</span>
+        </div>
+
+    </div>
+    <div id="signin-overlay" class="overlay row"></div>
+
+    <script src="/scripts/boundingBox.js"></script>
+    <script src="/scripts/sprite.js"></script>
+    <script src="/scripts/item.js"></script>
+    <script src="/scripts/player.js"></script>
+    
 
     <script>
-        // user defined
-       const user = {
-           name: '<?= $user->name ?>',
-           id: '<?= $user->id ?>',
-           socketId: '<?= $user->socket_id ?>'
-       };
+    $(function() {
+        /* Get the canvas and 2D context */
+        const canvas = document.getElementById("game-area");
+        const ctx = canvas.getContext("2d");
+        console.log(canvas.width, canvas.height)
+
+        const totalGameTime = 20;   // Total game time in seconds
+        let gameStartTime = 0;      // The timestamp when the game starts
+        let currentUserScore = 60;  // Current user's score
+
+        /* Set the ID here */ 
+        const playerOneID = 0; // replace with real id 
+        const playerTwoID = 1; // replace with read id 
+
+        /* Set the canvas width and height */
+        const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+
+        /* create players*/ 
+        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID); 
+        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID); 
+
+        /* Create the item sprites in the game */
+        const item = Item(ctx, gameArea, "candy")
+
+        /* Main processing of the game */
+        function doFrame(now) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // if (gameStartTime == 0) gameStartTime = now;
+            //
+            // /* Update the time remaining */
+            // const gameTimeSoFar = now - gameStartTime;
+            // const timeRemaining = Math.ceil((totalGameTime * 1000 - gameTimeSoFar) / 1000);
+            // $("#timer").text(timeRemaining);
+            //
+            // // Game Over situation
+            // if (timeRemaining <= 0) {
+            //     // Game Over
+            //     endGame()
+            // }
+            
+            // Update the player; 
+            playerOne.update(now); 
+            playerOne.draw(); 
+
+            playerTwo.update(now); 
+            playerTwo.draw(); 
+            // Update the item
+            item.update();
+            item.draw()
+
+            requestAnimationFrame(doFrame);
+        }
+
+        // User-defined
+        const user = {
+            name: '<?= $user->name ?>',
+            id: '<?= $user->id ?>',
+            socketId: '<?= $user->socket_id ?>'
+        };
+
+        // Placeholder for other users' scores
+        const otherUsers = [
+            { name: 'Player 1', score: 45 },
+            { name: 'Player 2', score: 52 },
+            { name: 'Player 3', score: 38 },
+        ];
+
+        $(document).ready(function () {
+            startCountdown();
+            $('#restart-game').click(function () {
+                $('#results-box').addClass('hidden');
+                $('#game-over').addClass('hidden');
+                $('#timer-box').removeClass('hidden');
+                $('#game-area').show();
+                startCountdown();
+            });
+        });
+
+        function startCountdown() {
+            const countdownElem = $('#countdown');
+            let countdown = 3;
+
+            countdownElem.text(countdown);
+            $('#game-start').show();
+            $('#timer-box').addClass('hidden');
+            $('#game-over').addClass('hidden');
+            $('#results-box').addClass('hidden');
+            $('#game-area').hide();
+
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    countdownElem.text(countdown);
+                } else {
+                    countdownElem.text("Game Start!");
+                }
+
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    $('#game-start').hide();
+                    $('#timer-box').removeClass('hidden');
+                    $('#game-area').show();
+                    startGame();
+                }
+            }, 1000);
+        }
+
+        function startGame() {
+            let timeLeft = 10;
+            $('#timer').text('Time: ' + timeLeft);
+
+            const gameInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(gameInterval);
+                    endGame();
+                } else {
+                    timeLeft--;
+                    $('#timer').text('Time: ' + timeLeft);
+                }
+            }, 1000);
+
+            requestAnimationFrame(doFrame);
+        }
+
+        function endGame() {
+            $('#game-over').removeClass('hidden');
+            $('#timer-box').addClass('hidden');
+            $('#game-area').hide();
+
+            setTimeout(() => {
+                $('#game-over').addClass('hidden');
+                //showResults();
+            }, 2000);
+        }
+        /* Get the current user's ID */
+        //    const currentUserID = Authentication.getCurrentUser().id;
+
+        /* Check if the player ID matches the current user's ID */
+        //if (player.id === currentUserID)
+        // Keep track of keys currently pressed down
+        let keysDown = {};
+
+        // Add keydown event listener
+        $(document).on("keydown", function(event) {
+            // Add key to keysDown object if it's an arrow key
+            if (event.keyCode >= 37 && event.keyCode <= 40) {
+                keysDown[event.keyCode] = true;
+            }
+
+            // Check for diagonal movement
+            if (keysDown[37] && keysDown[38]) { // Up-Left
+                playerOne.move(5);
+            } else if (keysDown[38] && keysDown[39]) { // Up-Right
+                playerOne.move(6);
+            } else if (keysDown[39] && keysDown[40]) { // Down-Right
+                playerOne.move(8);
+            } else if (keysDown[40] && keysDown[37]) { // Down-Left
+                playerOne.move(7);
+            } else {
+                // Handle non-diagonal movement
+                switch (event.keyCode) {
+                    case 37: // Left
+                        playerOne.move(1);
+                        break;
+                    case 38: // Up
+                        playerOne.move(2);
+                        break;
+                    case 39: // Right
+                        playerOne.move(3);
+                        break;
+                    case 40: // Down
+                        playerOne.move(4);
+                        break;
+                }
+            }
+        });
+
+                // Add keyup event listener
+        $(document).on("keyup", function(event) {
+            // Remove key from keysDown object if it's an arrow key
+            if (event.keyCode >= 37 && event.keyCode <= 40) {
+                delete keysDown[event.keyCode];
+            }
+
+            // Check for diagonal movement
+            if (keysDown[37] && keysDown[38]) { // Up-Left
+                playerOne.move(5);
+            } else if (keysDown[38] && keysDown[39]) { // Up-Right
+                playerOne.move(6);
+            } else if (keysDown[39] && keysDown[40]) { // Down-Right
+                playerOne.move(7);
+            } else if (keysDown[40] && keysDown[37]) { // Down-Left
+                playerOne.move(8);
+            } else {
+                // Handle non-diagonal movement
+                switch (event.keyCode) {
+                    case 37: // Left
+                        if (!keysDown[37]) playerOne.stop(1);
+                        if (keysDown[38]) playerOne.move(2);
+                        if (keysDown[40]) playerOne.move(4);
+                        break;
+                    case 38: // Up
+                        if (!keysDown[38]) playerOne.stop(2);
+                        if (keysDown[37]) playerOne.move(1);
+                        if (keysDown[39]) playerOne.move(3);
+                        break;
+                    case 39: // Right
+                        if (!keysDown[39]) playerOne.stop(3);
+                        if (keysDown[38]) playerOne.move(2);
+                        if (keysDown[40]) playerOne.move(4);
+                        break;
+                    case 40: // Down
+                        if (!keysDown[40]) playerOne.stop(4);
+                        if (keysDown[37]) playerOne.move(1);
+                        if (keysDown[39]) playerOne.move(3);
+                        break;
+                }
+            }
+        });
+    }); 
     </script>
-    <script src="/scripts/game.js"></script>
 </body>
 </html>

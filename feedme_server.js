@@ -68,7 +68,7 @@ app.get('/', (req, res) => {
 
 app.get('/game', (req, res) => {
     if (!req.session.user) {
-        return res.redirect("/login");
+        return res.redirect("/game");
     }
 
     res.render("game", {user : req.session.user});
