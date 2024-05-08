@@ -1,28 +1,62 @@
 // Define the `Item` object
 const Item = function (ctx, gameArea, item) {
     // Create a sprite object using the Sprite module
-    const sprite = Sprite(ctx, 0, 0);
+    const itemSprite = Sprite(ctx, 0, 0);
+    const foodSprite = Sprite(ctx, 0, 0);
 
     let angle = 0;
     let opacity = 1;
 
     // Define the sprite sheet sequences for different items
     const sequences = {
+        //Item For cheating
         candy: { x: 0, y: 0, width: 32, height: 32, count: 4, timing: 150, loop: true },
         glass: { x: 0, y: 32, width: 32, height: 32, count: 4, timing: 150, loop: true },
         timer: { x: 0, y: 64, width: 32, height: 32, count: 4, timing: 150, loop: true },
         flake: { x: 0, y: 96, width: 32, height: 32, count: 4, timing: 150, loop: true },
+        party: { x: 0, y: 128, width: 32, height: 32, count: 4, timing: 150, loop: true },
+
+        // Fruits with positive score
+        cake: { x: 0, y: 132.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: 100 },
+        cherry: { x: 66.7, y: 63, width: 34, height: 32, count: 1, timing: 150, loop: true, score: 50},
+        melon: { x: 299.7, y: 0, width: 32.7, height: 32, count: 1, timing: 150, loop: true, score: 30 },
+        orange: { x: 102, y: 164.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: 40 },
+        banana: { x: 33.3, y: 164.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: 10 },
+
+        // Fruits with negative score
+        poo: { x: 34, y: 33.7, width: 34, height: 32, count: 1, timing: 150, loop: true, score: -100 },
+        sign: { x: 34, y: 33.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: -50 },
     };
 
     // Initialize the sprite object with the sprite sheet
-    sprite.useSheet("/resources/item_sprites.png")
+    itemSprite.useSheet("/resources/item_sprites.png")
         .setSequence(sequences[item])
         .setScale(5);
 
+    foodSprite.useSheet("/resources/fruit_sprites.png")
+        .setSequence(sequences[item])
+        .setScale(3);
+
+    // Set the active sprite
+    let sprite = itemSprite;
+
+    const items = ['candy', 'glass', 'timer', 'flake', 'party'];
+    const foods = ['cake', 'berry', 'melon', 'orange', 'watermelon', 'poo', 'sign'];
+
     // Function to set the item sequence
     const setItem = function (item) {
+        if (items.includes(item)) {
+            sprite = itemSprite;
+        } else if (foods.includes(item)) {
+            sprite = foodSprite;
+        }
         sprite.setSequence(sequences[item]);
     };
+
+    // Function to set the item sequence
+    // const setItem = function (item) {
+    //     sprite.setSequence(sequences[item]);
+    // };
 
     // Function to randomize the item sequence
     const randomizeItem = function () {
@@ -83,7 +117,7 @@ const Item = function (ctx, gameArea, item) {
 
         // check X and Y values to see if they are out of bounds
         if(sprite.getXY().x < 32 || sprite.getXY().x > gameArea.width - 32 || sprite.getXY().y < 32 || sprite.getXY().y > gameArea.height - 32){
-            opacity -= 0.01;    // Decrease the opacity when the item is near the boundary
+            opacity -= 0.005;    // Decrease the opacity when the item is near the boundary
             if (opacity <= 0) {
                 randomize(gameArea);
                 opacity = 1;    // Reset the opacity when the item is repositioned
@@ -109,6 +143,9 @@ const Item = function (ctx, gameArea, item) {
         move: move,
         getAngle: getAngle,
         setItem: setItem,
-        randomize: randomize
+        randomize: randomize,
+        sprite: function () {
+            return sprite;
+        }
     };
 };

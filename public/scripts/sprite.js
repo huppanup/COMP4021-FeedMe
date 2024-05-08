@@ -129,6 +129,10 @@ const Sprite = function(ctx, x, y) {
         ctx.restore();
     };
 
+    const isAnimated = function() {
+            return sequence.count > 1;
+        }
+
     // This function draws the sprite.
     const drawSprite = function() {
         /* Save the settings */
@@ -204,6 +208,7 @@ const Sprite = function(ctx, x, y) {
         getBoundingBox: getBoundingBox,
         isReady: isReady,
         draw: draw,
-        update: update
+        update: update,
+        isAnimated: isAnimated
     };
 };

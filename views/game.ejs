@@ -43,6 +43,7 @@
             <span id="timer">Time: 60</span>
         </div>
 
+
     </div>
     <div id="signin-overlay" class="overlay row"></div>
 
@@ -62,17 +63,24 @@
 
 
         /* Create the items */
-        const items = [];
+        let items = [];
 
         /* Create the item sprites in the game */
         function createItems(ctx, canvas) {
-            const items = [
+            return [
                 Item(ctx, canvas, "candy"),
                 Item(ctx, canvas, "glass"),
                 Item(ctx, canvas, "timer"),
-                Item(ctx, canvas, "flask")
+                Item(ctx, canvas, "flask"),
+                Item(ctx, canvas, "party"),
+                Item(ctx, canvas, "cake"),
+                Item(ctx, canvas, "cherry"),
+                Item(ctx, canvas, "melon"),
+                Item(ctx, canvas, "orange"),
+                Item(ctx, canvas, "banana"),
+                Item(ctx, canvas, "poo"),
+                Item(ctx, canvas, "sign"),
             ];
-            return items;
         }
         items.push(...createItems(ctx, canvas));
 
@@ -95,7 +103,9 @@
             // Update all items
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             for (let item of items) {
-                item.update(now);
+                if (item.sprite().isAnimated()) { // Check if the sprite is animated
+                    item.update(now);
+                }
                 item.move(now, item.getAngle());
                 item.draw();
             }
@@ -123,7 +133,6 @@
             const gameArea = $('#game-area');
             gameArea.attr('width', container.width());
             gameArea.attr('height', container.height());
-
 
             startCountdown();
             $('#restart-game').click(function () {
@@ -180,6 +189,7 @@
 
             requestAnimationFrame(doFrame);
         }
+
 
         function endGame() {
             $('#game-over').removeClass('hidden');
