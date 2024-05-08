@@ -30,12 +30,12 @@ const Item = function (ctx, gameArea, item) {
 
     // Initialize the sprite object with the sprite sheet
     itemSprite.useSheet("/resources/item_sprites.png")
-        .setSequence(sequences[item])
-        .setScale(5);
+        .setSequence(sequences[item]);
+        //.setScale(2);
 
     foodSprite.useSheet("/resources/fruit_sprites.png")
-        .setSequence(sequences[item])
-        .setScale(3);
+        .setSequence(sequences[item]);
+        //.setScale(2);
 
     // Set the active sprite
     let sprite = itemSprite;
@@ -51,6 +51,16 @@ const Item = function (ctx, gameArea, item) {
             sprite = foodSprite;
         }
         sprite.setSequence(sequences[item]);
+
+
+        if (item === 'flake' || item === 'timer') {
+            sprite.setScale(3); // Set the scale to the desired value
+        } else if (item === 'glass') {
+            sprite.setScale(4); // Reset the scale for other items
+        } else {
+            sprite.setScale(2); // Reset the scale for other items
+        }
+
     };
 
     // Function to set the item sequence
