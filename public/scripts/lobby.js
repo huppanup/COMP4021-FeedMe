@@ -28,9 +28,13 @@ const Lobby = (function() {
         Socket.enterLobby(lobby_code);
     }
 
+    const setCode = function(code){
+        lobby_code = code;
+    }
+
     const showError = function(message){
         $("#enter-message").text(message);
     }
 
-    return { getLobbyCode, create, enter, showError };
+    return { getLobbyCode, create, enter, setCode, showError };
 })();

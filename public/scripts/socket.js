@@ -30,7 +30,10 @@ const Socket = (function() {
                     if (response.user.id == Authentication.getUser().id) window.location.href = "/lobby/" + response.code;
                     else console.log("User " + response.user.id + " has entered lobby.");
                 } else {
-                    if (response.user.id == Authentication.getUser().id) Lobby.showError(response.message);
+                    if (response.user.id == Authentication.getUser().id){
+                        Lobby.showError(response.message);
+                        Lobby.setCode(null);
+                    }
                 }
             });
      
