@@ -46,8 +46,50 @@
     </div>
     <div id="signin-overlay" class="overlay row"></div>
 
-    <script src="/scripts/game.js"></script>
+    <script src="/scripts/sprite.js"></script>
+    <script src="/scripts/item.js"></script>
+    <script src="/scripts/boundingBox.js"></script>
+
     <script>
+    $(function() {
+        /* Get the canvas and 2D context */
+        const canvas = document.getElementById("game-area");
+        const ctx = canvas.getContext("2d");
+        console.log(canvas.width, canvas.height)
+
+        const totalGameTime = 20;   // Total game time in seconds
+        let gameStartTime = 0;      // The timestamp when the game starts
+        let currentUserScore = 60;  // Current user's score
+
+        /* Set the canvas width and height */
+        const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+
+        /* Create the item sprites in the game */
+        const item = Item(ctx, gameArea, "candy")
+
+        /* Main processing of the game */
+        function doFrame(now) {
+
+            // if (gameStartTime == 0) gameStartTime = now;
+            //
+            // /* Update the time remaining */
+            // const gameTimeSoFar = now - gameStartTime;
+            // const timeRemaining = Math.ceil((totalGameTime * 1000 - gameTimeSoFar) / 1000);
+            // $("#timer").text(timeRemaining);
+            //
+            // // Game Over situation
+            // if (timeRemaining <= 0) {
+            //     // Game Over
+            //     endGame()
+            // }
+
+            // Update the item
+            item.update();
+            item.draw()
+
+            requestAnimationFrame(doFrame);
+        }
+
         // User-defined
         const user = {
             name: '<?= $user->name ?>',
@@ -61,9 +103,6 @@
             { name: 'Player 2', score: 52 },
             { name: 'Player 3', score: 38 },
         ];
-
-        // Current user's score
-        let currentUserScore = 60;
 
         $(document).ready(function () {
             startCountdown();
@@ -118,6 +157,8 @@
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
+
+            requestAnimationFrame(doFrame);
         }
 
         function endGame() {
@@ -127,35 +168,12 @@
 
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
-                showResults();
+                //showResults();
             }, 2000);
         }
 
-        function showResults() {
-            // Combine current user and other users
-            const results = [...otherUsers, { name: user.name, score: currentUserScore }];
 
-            // Sort by score descending
-            results.sort((a, b) => b.score - a.score);
-
-            // Populate the results table
-            const resultsTableBody = $('#results-table tbody');
-            resultsTableBody.empty();
-            results.forEach(player => {
-                resultsTableBody.append(`
-                    <tr>
-                        <td>${player.name}</td>
-                        <td>${player.score}</td>
-                    </tr>
-                `);
-            });
-
-            // Determine the winner
-            const winner = results[0].name;
-            $('#winner-text').text(`Winner: ${winner}`);
-
-            $('#results-box').removeClass('hidden');
-        }
+    });
     </script>
 </body>
 </html>
