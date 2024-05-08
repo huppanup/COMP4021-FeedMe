@@ -16,7 +16,7 @@ You need to install the following packages to run this project.
     
 (Note: Nodemon is only used to help development, it automatically restarts if the server is changed!)
 
-Install them using the `npm i` command (e.g. `npm i bcrypt`)
+Install them using the `npm i` command (e.g. `npm i bcrypt` if you want to install only bcrypt, just `npm i` to install all packages)
 
 ## Running the project
 
@@ -48,16 +48,23 @@ You can access the page on [localhost:3000/game](localhost:3000/game).
 
 ## Current progress
 
-UI of login page(WIP)
+Login/SignUp UI
 
 ![FeedMe Login Page](./public/resources/loginpage_sample.png)
+
+Enter/Create lobby UI
+![FeedMe Enter Lobby Page](./public/resources/enterlobby_sample.png)
 
 Completed Tasks
 1. Login/Signup UI
 2. Backend for login/signup
 3. User session (websocket)
+4. Enter/Create lobby overlay UI
+5. Logout(returns to login page)
+6. Enter/Create lobby backend
+
 
 Remaining Tasks(연우)
-1. Logout/delete account(?)
-2. Enter/Create lobby overlay
-3. Game lobby screen
+1. Delete account(?)
+2. Game lobby screen
+3. Leave game lobby

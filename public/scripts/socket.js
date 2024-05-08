@@ -21,8 +21,25 @@ const Socket = (function() {
             console.log("Socket : Remove user")
             user = JSON.parse(user);
         });
-        
     };
+
+    const enterLobby = function(code) {
+        if (socket && socket.connected) {
+            socket.once("entered lobby " + Lobby.getLobbyCode(), (response) => {
+                if (response.status == 'success'){
+                    if (response.user.id == Authentication.getUser().id) window.location.href = "/lobby/" + response.code;
+                    else console.log("User " + response.user.id + " has entered lobby.");
+                } else {
+                    if (response.user.id == Authentication.getUser().id){
+                        Lobby.showError(response.message);
+                        Lobby.setCode(null);
+                    }
+                }
+            });
+     
+            socket.emit("enter lobby", code);
+        }
+    }
 
     // This function disconnects the socket from the server
     const disconnect = function() {
@@ -31,5 +48,5 @@ const Socket = (function() {
         socket = null;
     };
 
-    return { getSocket, connect, disconnect };
+    return { getSocket, connect, enterLobby, disconnect };
 })();

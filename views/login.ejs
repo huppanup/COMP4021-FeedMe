@@ -7,8 +7,7 @@
 
 </head>
 <body>
-    <div id="container" class="col"> 
-    </div>
+    <div id="container" class="col"> </div>
     <div id="signin-overlay" class="overlay row">
         <div class="content shadow">
         <img id="overlay-title" src="resources/feed_me.svg" width="300px"/>
@@ -23,20 +22,79 @@
         </div>
     </div>
 
+    <div id="enterlobby-overlay" class="overlay row" style="display:none">
+        <div class="content shadow">
+        <img id="overlay-title" src="resources/feed_me.svg" width="300px"/>
+        <div class="center-content">
+        <form id="enter-form">
+            <div class="form-title">ENTER LOBBY</div>
+            <div class="form-entry">
+                <label for="lobby-code">Lobby Code</label>
+                <input type="text" id="lobby-code" name="lobby-code" placeholder="Enter Lobby Code" required/>
+            </div>
+            <button style="margin-top:10px" type="submit">Enter</button>
+            <div id="enter-message" class="warning center"></div>
+        </form>
+        </div>
+        <div class="spacer-vline"></div>
+        <form id="create-form">
+            <div class="form-title">CREATE LOBBY</div>
+            <div class="form-entry">
+                <label for="n-players">Number of Players</label>
+                <div class="options">
+                    <input type="radio" id="1" name="n_players" value="1" checked/>
+                    <label for="1">1</label>
+                    <input type="radio" id="2" name="n_players" value="2"/>
+                    <label for="2">2</label>
+                    <input type="radio" id="3" name="n_players" value="3"/>
+                    <label for="3">3</label>
+                    <input type="radio" id="4" name="n_players" value="4"/>
+                    <label for="4">4</label>
+                </div>
+            </div>
+            <div class="form-entry">
+                <label for="time">Time Limit</label>
+                <div class="options">
+                    <input type="radio" id="30" name="time" value="30" checked/>
+                    <label for="30">30s</label>
+                    <input type="radio" id="60" name="time" value="60"/>
+                    <label for="60">60s</label>
+                    <input type="radio" id="90" name="time" value="90"/>
+                    <label for="90">90s</label>
+                </div>
+            </div>
+            <button style="margin-top:10px" type="submit">CREATE</button>
+            <div id="enter-message" class="warning center"></div>
+        </form>
+        </div>
+    </div>
+
+    <div id="user-panel" style="display:none">
+        <span id="user-name" style="color:var(--overlay-caption-color)"></span>
+        <button id="signout-button">Sign Out<img height="20px" src="resources/logout.svg"></button>
+    </div>
+
     <script src="/socket.io/socket.io.min.js"></script>
     <script src="scripts/login.js"></script>
     <script src="scripts/authentication.js"></script>
     <script src="scripts/socket.js"></script>
+    <script src="scripts/lobby.js"></script>
+
 
     <script>
         $(function() {
             SignInForm.initialize();
             Authentication.validate(
                 () => {
+                    console.log("user exists");
+                    console.log(Authentication.getUser());
                     SignInForm.hide();
                     Socket.connect();
+                    LobbyForm.show(); 
+                    UserPanel.show(Authentication.getUser().id);               
                 },
                 () => {
+                    console.log("No user");
                     SignInForm.show();
                 }
             );

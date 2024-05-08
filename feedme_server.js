@@ -37,13 +37,26 @@ io.use((socket, next) => {
     gameSession(socket.request, {}, next);
 });
 
-// List of open rooms
-const rooms = {};
+// List of open lobbies
+const lobbies = {};
 
 // This helper function checks whether the text only contains word characters
 function containWordCharsOnly(text) {
     return /^\w+$/.test(text);
 }
+
+function generateLobbyCode() {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < 4) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
 // Handle requests
 app.get('/login', (req, res) => {
     res.render("login");
@@ -61,10 +74,17 @@ app.get('/game', (req, res) => {
     res.render("game", {user : req.session.user});
 })
 
+app.get('/lobby/:code?', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
+    res.render("lobby", {user : req.session.user, code: req.params.code});
+})
+
 // POST
 app.post("/signin", (req, res) => {
     const { id, password } = req.body;
-    console.log(req.body)
 
     const users = JSON.parse(fs.readFileSync("data/users.json"));
     if (! (id in users)) return res.json({status : "error", error : `Error : User ID does not exist.`});
@@ -93,6 +113,17 @@ app.post("/register", (req, res) => {
     return res.json({ status: "success" });
 });
 
+app.post("/create", (req, res) => {
+    const { n_players, time } = req.body;
+
+    let lobbyCode = generateLobbyCode();
+    while ( lobbyCode in lobbies ){ lobbyCode = generateLobbyCode(); }
+    lobbies[lobbyCode] = {"settings" : {"n_players" : n_players, "time" : time}, "players" : {}}
+    console.log("Lobbies");
+    console.log(lobbies);
+    res.json({ status: "success", lobby_code : lobbyCode});
+});
+
 // GET
 
 app.get("/validate", (req, res) => {
@@ -116,6 +147,21 @@ app.get("/signout", (req, res) => {
 // Handle Websocket
 io.on("connection", (socket) => {
     const user = socket.request.session.user;
+
+    socket.on("enter lobby", (code) => {
+        if (code in lobbies){
+            if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
+                io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
+            } else {
+                console.log("entering lobby " + code);
+                lobbies[code].players[user.id] = {"avatar" : "green"};
+                io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
+            }
+        } else {
+            io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} does not exist`});
+        }  
+    });
+
 
     socket.on("disconnect", () => {
         const user = socket.request.session.user;
