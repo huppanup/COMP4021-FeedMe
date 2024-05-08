@@ -64,20 +64,25 @@
         let currentUserScore = 60;  // Current user's score
 
 
-
         /* Create the items */
         let items = [];
         
         /* Set the ID here */ 
         const playerOneID = 0; // replace with real id 
-        const playerTwoID = 1; // replace with read id 
+        const playerTwoID = 1; // replace with read id
+
+        //set game-area size using container size
+        const container = $('#container');
+        const gameAreaCanvas = $('#game-area');
+        gameAreaCanvas.attr('width', container.width());
+        gameAreaCanvas.attr('height', container.height());
 
         /* Set the canvas width and height */
-        const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+        const gameArea = BoundingBox(ctx, 0, 0, gameAreaCanvas.width, gameAreaCanvas.height);
 
-        /* create players*/ 
-        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID); 
-        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID); 
+        /* create players*/
+        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID);
+        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID);
 
         /* Create the item sprites in the game */
         function createItems(ctx, canvas) {
@@ -113,10 +118,6 @@
             //     // Game Over
             //     endGame()
             // }
-            
-            // Update the player; 
-            playerOne.update(now); 
-            playerOne.draw(); 
 
             // Update all items
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -128,8 +129,12 @@
                 item.draw();
             }
 
-            playerTwo.update(now); 
-            playerTwo.draw(); 
+            // Update the player;
+            playerOne.update(now);
+            playerOne.draw();
+
+            // playerTwo.update(now);
+            // playerTwo.draw();
       
             requestAnimationFrame(doFrame);
         }
@@ -149,11 +154,11 @@
         ];
 
         $(document).ready(function () {
-            //set game-area size using container size
-            const container = $('#container');
-            const gameArea = $('#game-area');
-            gameArea.attr('width', container.width());
-            gameArea.attr('height', container.height());
+            // //set game-area size using container size
+            // const container = $('#container');
+            // const gameArea = $('#game-area');
+            // gameArea.attr('width', container.width());
+            // gameArea.attr('height', container.height());
 
             startCountdown();
             $('#restart-game').click(function () {
@@ -229,9 +234,6 @@
         //if (player.id === currentUserID)
         // Keep track of keys currently pressed down
         let keysDown = {};
-
-        gameArea.attr('width', container.width());
-        gameArea.attr('height', container.height());
 
         // Add keydown event listener
         $(document).on("keydown", function(event) {

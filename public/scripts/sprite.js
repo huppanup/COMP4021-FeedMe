@@ -54,7 +54,7 @@ const Sprite = function(ctx, x, y) {
     // - `yvalue` - The new y position
     const setXY = function(xvalue, yvalue) {
         [x, y] = [xvalue, yvalue];
-        console.log(x, y)
+        //console.log(x, y)
         return this;
     };
 

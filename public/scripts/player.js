@@ -1,6 +1,7 @@
 // This function defines the Player module.
 const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 
+
     // This is the sprite sequences of the player facing different directions.
     // It contains the idling sprite sequences `idleLeft`, `idleUp`, `idleRight` and `idleDown`,
     // and the moving sprite sequences `moveLeft`, `moveUp`, `moveRight` and `moveDown`.
@@ -134,7 +135,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 
     // This function updates the player depending on his movement.
     // - `time` - The timestamp when this function is called
-    const update = function(time) {
+    const update = function(now) {
         /* Update the player if the player is moving */
         if (direction != 0) {
             let { x, y } = sprite.getXY();
@@ -153,11 +154,12 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 
             /* Set the new position if it is within the game area */
             if (gameArea.isPointInBox(x, y))
+                console.log("x: ", x, "y: ", y)
                 sprite.setXY(x, y);
         }
 
         /* Update the sprite object */
-        sprite.update(time);
+        sprite.update(now);
     };
     // The methods are returned as an object here.
     return {

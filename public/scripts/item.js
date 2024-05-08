@@ -77,7 +77,7 @@ const Item = function (ctx, gameArea, item) {
 
     // Function to randomize the position of the item
     const randomize = function (area) {
-        console.log(area.width, area.height)
+        //console.log(area.width, area.height)
         // Randomize the starting point (boundary)
         const boundary = Math.floor(Math.random() * 4);
         let x, y;
@@ -104,7 +104,7 @@ const Item = function (ctx, gameArea, item) {
                 angle = Math.random() * Math.PI; // Move upwards
                 break;
         }
-        console.log(x, y)
+        //console.log(x, y)
 
         // Randomize the item sequence
         randomizeItem();
