@@ -37,13 +37,26 @@ io.use((socket, next) => {
     gameSession(socket.request, {}, next);
 });
 
-// List of open rooms
-const rooms = {};
+// List of open lobbies
+const lobbies = {};
 
 // This helper function checks whether the text only contains word characters
 function containWordCharsOnly(text) {
     return /^\w+$/.test(text);
 }
+
+function generateLobbyCode() {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < 4) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
 // Handle requests
 app.get('/login', (req, res) => {
     res.render("login");
@@ -90,6 +103,17 @@ app.post("/register", (req, res) => {
     fs.writeFileSync("data/users.json",JSON.stringify(users, null, " " ))
 
     return res.json({ status: "success" });
+});
+
+app.post("/create", (req, res) => {
+    const { n_players, time } = req.body;
+
+    let lobbyCode = generateLobbyCode();
+    while ( lobbyCode in lobbies ){ lobbyCode = generateLobbyCode(); }
+    lobbies[lobbyCode] = {"settings" : {"n_players" : n_players, "time" : time}, "players" : {}}
+    console.log("Lobbies");
+    console.log(lobbies);
+    res.json({ status: "success", lobby_code : lobbyCode});
 });
 
 // GET

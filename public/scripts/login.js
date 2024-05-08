@@ -30,7 +30,7 @@ const SignInForm = (function() {
                 Socket.connect();
                 LobbyForm.show();
                 // Redirect should not happen here! Will be changed.
-                window.location.href = "/game";
+                //window.location.href = "/game";
             },
             (error) => { clear(); $("#signin-message").text(error); }
         );
@@ -87,6 +87,19 @@ const LobbyForm = (function() {
     // This function initializes the UI
     const initialize = function() {
     };
+
+    $("#create-form").on("submit", (e) => {
+        // Do not submit the form
+        e.preventDefault();
+
+        // Get the input fields
+        const n_players = $('input[name="n_players"]:checked').val().trim();
+        const time = $('input[name="time"]:checked').val().trim();
+
+        console.log(n_players, time)
+
+        Lobby.create(n_players, time, () => {console.log("Created lobby!"), () => {console.log("Failed to create lobby.")}});
+    });
 
     const clear = function() {
         $("#create-form").get(0).reset();
