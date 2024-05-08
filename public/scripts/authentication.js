@@ -10,7 +10,6 @@ const Authentication = (function() {
     // This function sends a sign-in request to the server
     const signin = function(id, password, onSuccess, onError) {
         const json = JSON.stringify({"id":id, "password":password} )
-        console.log(json);
 
         fetch("/signin", { method : "POST", headers : { "Content-Type": "application/json" }, body : json})
         .then((res) => res.json() )
@@ -18,7 +17,7 @@ const Authentication = (function() {
             if (json.status == "error") { onError(json.error)}
             else if (json.status == "success") {
                 user = json.user; 
-                onSuccess();
+                onSuccess(user.id);
             }
         })
         .catch((err) => {
@@ -57,7 +56,7 @@ const Authentication = (function() {
         });
     };
 
-    const signout = function(onSuccess, onError) {
+    const signout = function(onSuccess) {
         fetch("/signout")
         .then((res) => res.json() )
         .then((json) => {

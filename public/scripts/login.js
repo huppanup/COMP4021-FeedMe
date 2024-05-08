@@ -25,10 +25,13 @@ const SignInForm = (function() {
 
         // Send a signin request
         Authentication.signin(username, password,
-            () => {
+            (id) => {
                 hide();
                 Socket.connect();
-                window.location.href = "/game";
+                LobbyForm.show();
+                UserPanel.show(id);
+                // Redirect should not happen here! Will be changed.
+                //window.location.href = "/game";
             },
             (error) => { clear(); $("#signin-message").text(error); }
         );
@@ -71,7 +74,7 @@ const SignInForm = (function() {
     };
 
     const show = function() {
-        $("#signin-overlay").fadIn(500);
+        $("#signin-overlay").fadeIn(500);
     };
 
     const generateInput = function(name, label, placeholder, type = 'text'){
@@ -79,4 +82,72 @@ const SignInForm = (function() {
         <input type=${type} id="${name}" name="${name}" placeholder="${placeholder}" required/></div>`
     }
     return {initialize, hide, show}
+})();
+
+const LobbyForm = (function() {
+    // This function initializes the UI
+    const initialize = function() {
+    };
+
+    $("#enter-form").on("submit", (e) => {
+        // Do not submit the form
+        e.preventDefault();
+
+        // Get the input fields
+        const code = $('#lobby-code').val().trim();
+        clear();
+        Lobby.enter(code);
+        
+    });
+
+
+    $("#create-form").on("submit", (e) => {
+        // Do not submit the form
+        e.preventDefault();
+
+        // Get the input fields
+        const n_players = $('input[name="n_players"]:checked').val().trim();
+        const time = $('input[name="time"]:checked').val().trim();
+        clear();
+
+        Lobby.create(n_players, time);
+    });
+
+    const clear = function() {
+        $("#create-form").get(0).reset();
+        $("#enter-form").get(0).reset();
+        $("#create-message").text("");
+        $("#enter-message").text("");
+    }
+
+    const show = function() {
+        $("#enterlobby-overlay").fadeIn(500);
+    };
+
+    return {initialize, show}
+})();
+
+
+const UserPanel = (function() {
+    // This function initializes the UI
+    const initialize = function() {
+    };
+
+    $("#signout-button").on("click", (e) => {
+        // Do not submit the form
+        e.preventDefault();
+
+        Authentication.signout(() => {
+            Socket.disconnect();
+            window.location.href = "/login";
+        })
+    });
+
+    const show = function(id) {
+        console.log(id)
+        $("#user-name").text("Welcome, " + id);
+        $("#user-panel").fadeIn(500);
+    };
+
+    return {initialize, show}
 })();
