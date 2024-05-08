@@ -85,9 +85,14 @@ const SignInForm = (function() {
 })();
 
 const LobbyForm = (function() {
+    let lobby_code = null;
     // This function initializes the UI
     const initialize = function() {
     };
+
+    const getLobbyCode = function() {
+        return lobby_code;
+    }
 
     $("#enter-form").on("submit", (e) => {
         // Do not submit the form
@@ -96,10 +101,9 @@ const LobbyForm = (function() {
         // Get the input fields
         const code = $('#lobby-code').val().trim();
         clear();
-        Lobby.enter(code);
+        enter(code);
         
     });
-
 
     $("#create-form").on("submit", (e) => {
         // Do not submit the form
@@ -110,8 +114,38 @@ const LobbyForm = (function() {
         const time = $('input[name="time"]:checked').val().trim();
         clear();
 
-        Lobby.create(n_players, time);
+        create(n_players, time);
     });
+
+    const create = function(n_players, time) {
+        const json = JSON.stringify({"n_players":n_players, "time":time} )
+
+        fetch("/create", { method : "POST", headers : { "Content-Type": "application/json" }, body : json})
+        .then((res) => res.json() )
+        .then((json) => {
+            if (json.status == "success") {
+                lobby_code = json.lobby_code; 
+                Socket.enterLobby(lobby_code);
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log("Error!");
+        });
+    };
+
+    const enter = function(code){
+        lobby_code = code;
+        Socket.enterLobby(lobby_code);
+    }
+
+    const setCode = function(code){
+        lobby_code = code;
+    }
+
+    const showError = function(message){
+        $("#enter-message").text(message);
+    }
 
     const clear = function() {
         $("#create-form").get(0).reset();
@@ -124,9 +158,8 @@ const LobbyForm = (function() {
         $("#enterlobby-overlay").fadeIn(500);
     };
 
-    return {initialize, show}
+    return {initialize, show, getLobbyCode, create, enter, setCode, showError }
 })();
-
 
 const UserPanel = (function() {
     // This function initializes the UI

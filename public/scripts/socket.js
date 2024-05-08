@@ -25,14 +25,14 @@ const Socket = (function() {
 
     const enterLobby = function(code) {
         if (socket && socket.connected) {
-            socket.once("entered lobby " + Lobby.getLobbyCode(), (response) => {
+            socket.once("entered lobby " + LobbyForm.getLobbyCode(), (response) => {
                 if (response.status == 'success'){
                     if (response.user.id == Authentication.getUser().id) window.location.href = "/lobby/" + response.code;
                     else console.log("User " + response.user.id + " has entered lobby.");
                 } else {
                     if (response.user.id == Authentication.getUser().id){
-                        Lobby.showError(response.message);
-                        Lobby.setCode(null);
+                        LobbyForm.showError(response.message);
+                        LobbyForm.setCode(null);
                     }
                 }
             });

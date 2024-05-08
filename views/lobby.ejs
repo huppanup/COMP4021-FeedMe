@@ -3,13 +3,44 @@
 <head>
 <title>Feed Me!</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<link href="stylesheets/lobby.css" rel="stylesheet">
-
+<link href="../stylesheets/lobby.css" rel="stylesheet">
 </head>
+
 <body>
     <div id="container" class="col"> 
-        Lobby Page!
+        <div id="game-lobby">
+            <div id="game-panel">Game Panel</div>
+            <div id="game-users">Game Users</div>
+        </div>
+    </div>
+    <div id="user-panel">
+        <span id="user-name" style="color:var(--caption-color)">Hi</span>
+        <button id="signout-button">Sign Out<img height="20px" src="../resources/logout.svg"></button>
     </div>
     <script src="/socket.io/socket.io.min.js"></script>
+    <script src="../scripts/authentication.js"></script>
+    <script src="../scripts/lobby.js"></script>
+
+    <script>
+        Lobby.initialize('<%= code %>')
+        Authentication.validate(
+            () => {
+                Lobby.validate(
+                    () => {
+                        UserPanel.initialize();
+                    },
+                    (err) => {
+                        console.log(err);
+                        window.location.href = "/login"
+                    }
+                );            
+            },
+            () => {
+                console.log("No user");
+                window.location.href = "/login"
+            }
+        );
+    </script>
+
 </body>
 </html>

@@ -1,40 +1,44 @@
-const Lobby = (function() {
+const Lobby = (function() { 
     let lobby_code = null;
+    const initialize = function(code){ lobby_code = code; console.log(lobby_code);}
 
-    const getLobbyCode = function() {
-        return lobby_code;
-    }
+    const getLobbyCode = function(){ return lobby_code; }
 
-    // This function sends a sign-in request to the server
-    const create = function(n_players, time) {
-        const json = JSON.stringify({"n_players":n_players, "time":time} )
-
-        fetch("/create", { method : "POST", headers : { "Content-Type": "application/json" }, body : json})
+    const validate = function(onSuccess, onError){
+        let code = JSON.stringify({code:Lobby.getLobbyCode()});
+        fetch("/validate_lobby", { method : "POST", headers : { "Content-Type": "application/json" }, body : code})
         .then((res) => res.json() )
         .then((json) => {
             if (json.status == "success") {
                 lobby_code = json.lobby_code; 
-                Socket.enterLobby(lobby_code);
+                onSuccess();
+            } else {
+                onError(json.error);
             }
         })
         .catch((err) => {
             console.log(err);
-            console.log("Error!");
         });
+    }
+
+    return { initialize, getLobbyCode, validate };
+})();
+
+const UserPanel = (function() {
+    // This function initializes the UI
+    const initialize = function() {
+        console.log("Initialize user panel");
+        $("#user-name").text("Welcome, " + Authentication.getUser().id);
     };
 
-    const enter = function(code){
-        lobby_code = code;
-        Socket.enterLobby(lobby_code);
-    }
+    $("#signout-button").on("click", (e) => {
+        // Do not submit the form
+        e.preventDefault();
 
-    const setCode = function(code){
-        lobby_code = code;
-    }
+        Authentication.signout(() => {
+            window.location.href = "/login";
+        })
+    });
 
-    const showError = function(message){
-        $("#enter-message").text(message);
-    }
-
-    return { getLobbyCode, create, enter, setCode, showError };
+    return {initialize}
 })();
