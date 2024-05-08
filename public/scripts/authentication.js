@@ -66,6 +66,7 @@ const Authentication = (function() {
             }
         })
         .catch((err) => {
+            console.log(err);
             console.log("Error!");
         });
     };

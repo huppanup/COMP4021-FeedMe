@@ -79,7 +79,7 @@ app.get('/lobby/:code?', (req, res) => {
         return res.redirect("/login");
     }
 
-    res.render("lobby", {user : req.session.user, code: req.params.code});
+    res.render("lobby", {code: req.params.code});
 })
 
 // POST
@@ -119,10 +119,20 @@ app.post("/create", (req, res) => {
     let lobbyCode = generateLobbyCode();
     while ( lobbyCode in lobbies ){ lobbyCode = generateLobbyCode(); }
     lobbies[lobbyCode] = {"settings" : {"n_players" : n_players, "time" : time}, "players" : {}}
-    console.log("Lobbies");
-    console.log(lobbies);
     res.json({ status: "success", lobby_code : lobbyCode});
 });
+
+app.post("/validate_lobby", (req, res) => {
+    const {code} = req.body;
+
+    const user = req.session.user;
+
+    if (!(code in lobbies)) return res.json({status : "error", error : "Error : The lobby does not exist."});
+    if (!(user.id in lobbies[code].players)) return res.json({status : "error", error : "Error : You are not in this lobby."})
+    
+    return res.json({ status: "success"})
+});
+
 
 // GET
 
@@ -153,7 +163,6 @@ io.on("connection", (socket) => {
             if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
                 io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
             } else {
-                console.log("entering lobby " + code);
                 lobbies[code].players[user.id] = {"avatar" : "green"};
                 io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
             }
@@ -165,7 +174,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         const user = socket.request.session.user;
-        io.emit("remove user", JSON.stringify({username: user.username, avatar : user.avatar, name : user.name}));
+        io.emit("remove user", JSON.stringify({id: user.id}));
     })
     
 });
