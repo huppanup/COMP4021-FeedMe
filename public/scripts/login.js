@@ -25,10 +25,11 @@ const SignInForm = (function() {
 
         // Send a signin request
         Authentication.signin(username, password,
-            () => {
+            (id) => {
                 hide();
                 Socket.connect();
                 LobbyForm.show();
+                UserPanel.show(id);
                 // Redirect should not happen here! Will be changed.
                 //window.location.href = "/game";
             },
@@ -88,6 +89,18 @@ const LobbyForm = (function() {
     const initialize = function() {
     };
 
+    $("#enter-form").on("submit", (e) => {
+        // Do not submit the form
+        e.preventDefault();
+
+        // Get the input fields
+        const code = $('#lobby-code').val().trim();
+        clear();
+        Lobby.enter(code);
+        
+    });
+
+
     $("#create-form").on("submit", (e) => {
         // Do not submit the form
         e.preventDefault();
@@ -95,10 +108,9 @@ const LobbyForm = (function() {
         // Get the input fields
         const n_players = $('input[name="n_players"]:checked').val().trim();
         const time = $('input[name="time"]:checked').val().trim();
+        clear();
 
-        console.log(n_players, time)
-
-        Lobby.create(n_players, time, () => {console.log("Created lobby!"), () => {console.log("Failed to create lobby.")}});
+        Lobby.create(n_players, time);
     });
 
     const clear = function() {
@@ -108,15 +120,34 @@ const LobbyForm = (function() {
         $("#enter-message").text("");
     }
 
-    const hide = function() {
-        clear();
-        $("#enterlobby-overlay").fadeOut(500);
-    };
-
     const show = function() {
-        console.log("lobby overlay fade in");
         $("#enterlobby-overlay").fadeIn(500);
     };
 
-    return {initialize, hide, show}
+    return {initialize, show}
+})();
+
+
+const UserPanel = (function() {
+    // This function initializes the UI
+    const initialize = function() {
+    };
+
+    $("#signout-button").on("click", (e) => {
+        // Do not submit the form
+        e.preventDefault();
+
+        Authentication.signout(() => {
+            Socket.disconnect();
+            window.location.href = "/login";
+        })
+    });
+
+    const show = function(id) {
+        console.log(id)
+        $("#user-name").text("Welcome, " + id);
+        $("#user-panel").fadeIn(500);
+    };
+
+    return {initialize, show}
 })();

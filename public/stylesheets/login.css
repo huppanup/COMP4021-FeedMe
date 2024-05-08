@@ -178,7 +178,7 @@ input::placeholder, select {
     gap: 10px;
 }
 
-button {
+button:not(#signout-button) {
     font-weight: bold;
     height: 40px;
     border: none;
@@ -191,31 +191,32 @@ button {
     cursor: pointer;
 }
 
-button:hover {
+button:not(#signout-button):hover {
     background: var(--overlay-caption-color);
 }
-button:active {
+button:not(#signout-button):active {
     margin: 2px -2px -2px 2px;
     box-shadow: 0px 0px;
 }
-button.icon {
-    height: inherit;
+
+button#signout-button {
+    display:flex;
+    align-items: center;
+    gap:10px;
+    font-weight: bold;
+    color: var(--overlay-caption-color);
+    height: 50px;
     border: none;
-    border-radius: 2px;
-    background: none;
-    box-shadow: none;
-    padding: 3px 5px;
-    padding-top: 5px;
+    border-radius: 30px;
+    color: none;
+    background-color: white;
+    padding: 0 20px;
+    white-space: nowrap;
+    transition: 0.5s background;
+    cursor: pointer;
+    box-shadow: 0px 0px 3px var(--overlay-caption-color);
 }
-button.icon * {
-    color: white;
-}
-button.icon:hover {
-    background: var(--button-background-hover);
-}
-button.icon:active {
-    margin: 2px -2px -2px 2px;
-}
+
 
 /* Data field caption and content */
 .field-content {
@@ -261,7 +262,18 @@ button.icon:active {
     font-size: 36px;
 }
 #user-panel {
-    padding: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    position:fixed;
+    justify-content: flex-end;
+    align-items: center;
+    height: 50px;
+    top : 10px;
+    right:20px;
+    padding: 0px 0px 0px 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 30px;
 }
 #signin-user {
     cursor: pointer;

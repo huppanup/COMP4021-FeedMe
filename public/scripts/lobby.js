@@ -1,23 +1,20 @@
 const Lobby = (function() {
+    let lobby_code = null;
 
-    let code = null;
-
-    const getCode = function() {
-        return code;
+    const getLobbyCode = function() {
+        return lobby_code;
     }
 
     // This function sends a sign-in request to the server
-    const create = function(n_players, time, onSuccess, onError) {
+    const create = function(n_players, time) {
         const json = JSON.stringify({"n_players":n_players, "time":time} )
 
         fetch("/create", { method : "POST", headers : { "Content-Type": "application/json" }, body : json})
         .then((res) => res.json() )
         .then((json) => {
-            if (json.status == "error") { onError(json.error)}
-            else if (json.status == "success") {
-                code = json.lobby_code; 
-                console.log("Lobby code : " + code);
-                onSuccess();
+            if (json.status == "success") {
+                lobby_code = json.lobby_code; 
+                Socket.enterLobby(lobby_code);
             }
         })
         .catch((err) => {
@@ -26,5 +23,14 @@ const Lobby = (function() {
         });
     };
 
-    return { create };
+    const enter = function(code){
+        lobby_code = code;
+        Socket.enterLobby(lobby_code);
+    }
+
+    const showError = function(message){
+        $("#enter-message").text(message);
+    }
+
+    return { getLobbyCode, create, enter, showError };
 })();

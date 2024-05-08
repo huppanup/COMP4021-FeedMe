@@ -7,8 +7,7 @@
 
 </head>
 <body>
-    <div id="container" class="col"> 
-    </div>
+    <div id="container" class="col"> </div>
     <div id="signin-overlay" class="overlay row">
         <div class="content shadow">
         <img id="overlay-title" src="resources/feed_me.svg" width="300px"/>
@@ -70,6 +69,11 @@
         </div>
     </div>
 
+    <div id="user-panel" style="display:none">
+        <span id="user-name" style="color:var(--overlay-caption-color)"></span>
+        <button id="signout-button">Sign Out<img height="20px" src="resources/logout.svg"></button>
+    </div>
+
     <script src="/socket.io/socket.io.min.js"></script>
     <script src="scripts/login.js"></script>
     <script src="scripts/authentication.js"></script>
@@ -82,11 +86,15 @@
             SignInForm.initialize();
             Authentication.validate(
                 () => {
+                    console.log("user exists");
+                    console.log(Authentication.getUser());
                     SignInForm.hide();
                     Socket.connect();
-                    LobbyForm.show();                
+                    LobbyForm.show(); 
+                    UserPanel.show(Authentication.getUser().id);               
                 },
                 () => {
+                    console.log("No user");
                     SignInForm.show();
                 }
             );

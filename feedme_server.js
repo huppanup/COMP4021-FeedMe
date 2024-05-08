@@ -74,6 +74,14 @@ app.get('/game', (req, res) => {
     res.render("game", {user : req.session.user});
 })
 
+app.get('/lobby/:code?', (req, res) => {
+    if (!req.session.user) {
+        return res.redirect("/login");
+    }
+
+    res.render("lobby", {user : req.session.user, code: req.params.code});
+})
+
 // POST
 app.post("/signin", (req, res) => {
     const { id, password } = req.body;
@@ -139,6 +147,21 @@ app.get("/signout", (req, res) => {
 // Handle Websocket
 io.on("connection", (socket) => {
     const user = socket.request.session.user;
+
+    socket.on("enter lobby", (code) => {
+        if (code in lobbies){
+            if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
+                io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
+            } else {
+                console.log("entering lobby " + code);
+                lobbies[code].players[user.id] = {"avatar" : "green"};
+                io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
+            }
+        } else {
+            io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} does not exist`});
+        }  
+    });
+
 
     socket.on("disconnect", () => {
         const user = socket.request.session.user;
