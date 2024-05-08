@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="container" class="col">
-        <canvas id="game-area" width="854" height="480"></canvas>
+        <canvas id="game-area"></canvas>
 
         <!-- Game Start Countdown -->
         <div id="game-start" class="center start-text">
@@ -55,17 +55,26 @@
         /* Get the canvas and 2D context */
         const canvas = document.getElementById("game-area");
         const ctx = canvas.getContext("2d");
-        console.log(canvas.width, canvas.height)
 
         const totalGameTime = 20;   // Total game time in seconds
         let gameStartTime = 0;      // The timestamp when the game starts
         let currentUserScore = 60;  // Current user's score
 
-        /* Set the canvas width and height */
-        const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+
+        /* Create the items */
+        const items = [];
 
         /* Create the item sprites in the game */
-        const item = Item(ctx, gameArea, "candy")
+        function createItems(ctx, canvas) {
+            const items = [
+                Item(ctx, canvas, "candy"),
+                Item(ctx, canvas, "glass"),
+                Item(ctx, canvas, "timer"),
+                Item(ctx, canvas, "flask")
+            ];
+            return items;
+        }
+        items.push(...createItems(ctx, canvas));
 
         /* Main processing of the game */
         function doFrame(now) {
@@ -83,9 +92,13 @@
             //     endGame()
             // }
 
-            // Update the item
-            item.update();
-            item.draw()
+            // Update all items
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let item of items) {
+                item.update(now);
+                item.move(now, item.getAngle());
+                item.draw();
+            }
 
             requestAnimationFrame(doFrame);
         }
@@ -105,6 +118,13 @@
         ];
 
         $(document).ready(function () {
+            //set game-area size using container size
+            const container = $('#container');
+            const gameArea = $('#game-area');
+            gameArea.attr('width', container.width());
+            gameArea.attr('height', container.height());
+
+
             startCountdown();
             $('#restart-game').click(function () {
                 $('#results-box').addClass('hidden');
@@ -153,7 +173,7 @@
                     clearInterval(gameInterval);
                     endGame();
                 } else {
-                    timeLeft--;
+                    //timeLeft--;
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
@@ -171,6 +191,11 @@
                 //showResults();
             }, 2000);
         }
+
+        const container = $('#container');
+        const gameArea = $('#game-area');
+        gameArea.attr('width', container.width());
+        gameArea.attr('height', container.height());
 
 
     });

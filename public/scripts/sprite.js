@@ -54,6 +54,7 @@ const Sprite = function(ctx, x, y) {
     // - `yvalue` - The new y position
     const setXY = function(xvalue, yvalue) {
         [x, y] = [xvalue, yvalue];
+        console.log(x, y)
         return this;
     };
 
@@ -163,7 +164,7 @@ const Sprite = function(ctx, x, y) {
     // This function draws the shadow and the sprite.
     const draw = function() {
         if (isReady()) {
-            drawShadow();
+            //drawShadow();
             drawSprite();
         }
         return this;
