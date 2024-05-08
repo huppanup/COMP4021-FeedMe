@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="container" class="col">
-        <canvas id="game-area" width="854" height="480"></canvas>
+        <canvas id="game-area"></canvas>
 
         <!-- Game Start Countdown -->
         <div id="game-start" class="center start-text">
@@ -43,6 +43,7 @@
             <span id="timer">Time: 60</span>
         </div>
 
+
     </div>
     <div id="signin-overlay" class="overlay row"></div>
 
@@ -57,12 +58,16 @@
         /* Get the canvas and 2D context */
         const canvas = document.getElementById("game-area");
         const ctx = canvas.getContext("2d");
-        console.log(canvas.width, canvas.height)
 
         const totalGameTime = 20;   // Total game time in seconds
         let gameStartTime = 0;      // The timestamp when the game starts
         let currentUserScore = 60;  // Current user's score
 
+
+
+        /* Create the items */
+        let items = [];
+        
         /* Set the ID here */ 
         const playerOneID = 0; // replace with real id 
         const playerTwoID = 1; // replace with read id 
@@ -75,7 +80,23 @@
         const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID); 
 
         /* Create the item sprites in the game */
-        const item = Item(ctx, gameArea, "candy")
+        function createItems(ctx, canvas) {
+            return [
+                Item(ctx, canvas, "candy"),
+                Item(ctx, canvas, "glass"),
+                Item(ctx, canvas, "timer"),
+                Item(ctx, canvas, "flask"),
+                Item(ctx, canvas, "party"),
+                Item(ctx, canvas, "cake"),
+                Item(ctx, canvas, "cherry"),
+                Item(ctx, canvas, "melon"),
+                Item(ctx, canvas, "orange"),
+                Item(ctx, canvas, "banana"),
+                Item(ctx, canvas, "poo"),
+                Item(ctx, canvas, "sign"),
+            ];
+        }
+        items.push(...createItems(ctx, canvas));
 
         /* Main processing of the game */
         function doFrame(now) {
@@ -97,12 +118,19 @@
             playerOne.update(now); 
             playerOne.draw(); 
 
+            // Update all items
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let item of items) {
+                if (item.sprite().isAnimated()) { // Check if the sprite is animated
+                    item.update(now);
+                }
+                item.move(now, item.getAngle());
+                item.draw();
+            }
+
             playerTwo.update(now); 
             playerTwo.draw(); 
-            // Update the item
-            item.update();
-            item.draw()
-
+      
             requestAnimationFrame(doFrame);
         }
 
@@ -121,6 +149,12 @@
         ];
 
         $(document).ready(function () {
+            //set game-area size using container size
+            const container = $('#container');
+            const gameArea = $('#game-area');
+            gameArea.attr('width', container.width());
+            gameArea.attr('height', container.height());
+
             startCountdown();
             $('#restart-game').click(function () {
                 $('#results-box').addClass('hidden');
@@ -169,13 +203,14 @@
                     clearInterval(gameInterval);
                     endGame();
                 } else {
-                    timeLeft--;
+                    //timeLeft--;
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
 
             requestAnimationFrame(doFrame);
         }
+
 
         function endGame() {
             $('#game-over').removeClass('hidden');
@@ -194,6 +229,11 @@
         //if (player.id === currentUserID)
         // Keep track of keys currently pressed down
         let keysDown = {};
+
+        const container = $('#container');
+        const gameArea = $('#game-area');
+        gameArea.attr('width', container.width());
+        gameArea.attr('height', container.height());
 
         // Add keydown event listener
         $(document).on("keydown", function(event) {
