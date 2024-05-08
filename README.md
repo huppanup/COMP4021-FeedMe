@@ -60,8 +60,11 @@ Completed Tasks
 2. Backend for login/signup
 3. User session (websocket)
 4. Enter/Create lobby overlay UI
+5. Logout(returns to login page)
+6. Enter/Create lobby backend
+
 
 Remaining Tasks(연우)
-1. Logout/delete account(?)
-2. Enter/Create lobby backend
-3. Game lobby screen
+1. Delete account(?)
+2. Game lobby screen
+3. Leave game lobby
