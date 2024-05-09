@@ -79,9 +79,8 @@ app.get('/lobby/:code?', (req, res) => {
         return res.redirect("/login");
     }
     if (!lobbies[req.params.code]) return res.redirect("/login");
-    const n_players = lobbies[req.params.code].settings.n_players;
-    const time = lobbies[req.params.code].settings.time 
-    res.render("lobby", {code: req.params.code, n_players: n_players, time: time });
+    const lobby = JSON.stringify(lobbies[req.params.code], null, 0);
+    res.render("lobby", {code: req.params.code, lobby: lobby });
 })
 
 // POST
@@ -168,6 +167,7 @@ io.on("connection", (socket) => {
             } else {
                 lobbies[code].players[user.id] = {color : "green"};
                 io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
+                io.emit("updated lobby " + code, lobbies[code]);
             }
         } else {
             io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} does not exist`});
@@ -185,10 +185,10 @@ io.on("connection", (socket) => {
         if (Object.keys(lobbies[code].players).length == 0){
             console.log("Lobby "+ code + " empty, removing...");
             delete lobbies[code];
+        } else {
+            io.emit("updated lobby " + code, lobbies[code]);
         }
-        console.log(lobbies);
         io.emit("left lobby " + code, user);
-
     })
 
     socket.on("disconnect", () => {

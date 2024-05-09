@@ -127,6 +127,9 @@ body {
 
 .player-box{
     width: 50%; height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 2px solid var(--primary-color);
 }
 
@@ -135,8 +138,8 @@ body {
 #p3{ border-left : none; border-bottom : none; }
 #p4{ border-right : none; border-bottom : none; }
 
-
-
+.waiting{ font-size: larger; color: var(--primary-color);}
+.no-user{ width : 50%; }
 
 /* User Panel */
 #user-panel {

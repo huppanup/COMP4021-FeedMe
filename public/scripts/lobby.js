@@ -1,10 +1,12 @@
 const Lobby = (function() { 
     let lobby_code = null;
-    let lobby_settings = null;
-    const initialize = function(code, n, time){ 
+    let lobby_state = null;
+    const initialize = function(code, lobby){ 
         lobby_code = code;
-        lobby_settings = {n_players:n, time:time};
+        lobby_state = lobby;
         GamePanel.initialize();
+        PlayerPanel.initialize();
+
         $("#leave-lobby").on('click', (e) => {
             e.preventDefault();
             Socket.leaveLobby(code);
@@ -12,9 +14,13 @@ const Lobby = (function() {
     }
 
     const getLobbyCode = function(){ return lobby_code; }
-    const getLobbySettings = function(){ return lobby_settings; }
+    const getLobbyState = function(){ return lobby_state; }
+    const getLobbySettings = function(){ return lobby_state.settings; }
 
-
+    const updateLobbyState = function(lobby){ 
+        lobby_state = lobby;
+        PlayerPanel.updateUI();
+    }
 
     const validate = function(onSuccess, onError){
         let code = JSON.stringify({code: Lobby.getLobbyCode()});
@@ -32,7 +38,7 @@ const Lobby = (function() {
         });
     }
 
-    return { initialize, getLobbyCode, getLobbySettings, validate };
+    return { initialize, getLobbyCode, getLobbyState, updateLobbyState, getLobbySettings, validate };
 })();
 
 const GamePanel = (function(){
@@ -62,6 +68,35 @@ const GamePanel = (function(){
     };
 
     return {initialize}
+})();
+
+const PlayerPanel = (function(){
+    const initialize = function() {
+        const players = Lobby.getLobbyState().players;
+        const max_players = parseInt(Lobby.getLobbySettings().n_players);
+        let i = 0;
+        for (id in players){
+            $(`.player-box:eq(${i})`).html(`<div class="player" id=${id}>${id}</div>`);
+            i++;
+        }
+        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting">Waiting...</div>');
+        $('.player-box').slice(max_players)
+        .html('<img class="no-user" src="../resources/no_player.svg">');
+    };
+
+    const updateUI = function(){
+        const players = Lobby.getLobbyState().players;
+        const max_players = parseInt(Lobby.getLobbySettings().n_players);
+        let i = 0;
+        for (id in players){
+            $(`.player-box:eq(${i})`).html(`<div class="player" id=${id}>${id}</div>`);
+            i++;
+        }
+        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting">Waiting...</div>');
+    };
+
+    return {initialize, updateUI}
+
 })();
 
 const UserPanel = (function() {
