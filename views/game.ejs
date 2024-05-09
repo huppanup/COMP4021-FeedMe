@@ -173,7 +173,8 @@
         }
 
         function startGame() {
-            let timeLeft = 10;
+            let timeLeft = JSON.parse(settings).time;
+
             $('#timer').text('Time: ' + timeLeft);
 
             const gameInterval = setInterval(() => {
@@ -200,8 +201,8 @@
                 //showResults();
             }, 2000);
         }
-        /* Get the current user's ID */
-        //    const currentUserID = Authentication.getCurrentUser().id;
+
+
 
         /* Check if the player ID matches the current user's ID */
         //if (player.id === currentUserID)
@@ -243,7 +244,7 @@
         //     }
         // });
 
-                // Add keyup event listener
+        // Add keyup event listener
         // $(document).on("keyup", function(event) {
         //     // Remove key from keysDown object if it's an arrow key
         //     if (event.keyCode >= 37 && event.keyCode <= 40) {
