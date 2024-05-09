@@ -72,6 +72,8 @@
         canvas.width = container.width();
         canvas.height = container.height();
 
+        let animationFrameId;
+
         const sounds = {
             background: new Audio("/resources/background.mp3"),
             food: new Audio("/resources/food.mp3"),
@@ -117,30 +119,23 @@
                 if (checkCollision(player, item)) {
                     console.log(item.getItem())
                     if (correctItems.has(item.getItem())) {
-                        player.updateScore(item.getScore());
-                        $('#score').text('Score: ' + player.getScore());
-                    }
-                    item.randomize(canvas);
-                    if (item.getScore() < 0) sounds.hit.play();
-                    if (item.getScore() > 0) sounds.food.play();
-                    if (item.getScore() == 0) sounds.item.play();
-                    const temp = checkCheat();
-                    if (temp){
-                        if (item.getScore() < 0){
-                            item.randomize(canvas);
-                        }
-                        else {
+                        if (item.getScore() < 0) sounds.hit.play();
+                        if (item.getScore() > 0) sounds.food.play();
+                        if (item.getScore() === 0) sounds.item.play();
+
+                        const temp = checkCheat();
+                        if (temp){
+                            if (item.getScore() < 0){
+                                item.randomize(canvas);
+                            }
+                        } else {
                             player.updateScore(item.getScore());
                             $('#score').text('Score: ' + player.getScore());
                             item.randomize(canvas);
                         }
                     }
-                    else {
-                        player.updateScore(item.getScore());
-                        console.log(item.getScore());
-                        $('#score').text('Score: ' + player.getScore());
-                        item.randomize(canvas);
-                    }
+                    item.randomize(canvas);
+
                 }
             }
 
@@ -207,15 +202,18 @@
                 }
             }, 1000);
 
-            requestAnimationFrame(doFrame);
+            animationFrameId = requestAnimationFrame(doFrame);
         }
 
         function endGame() {
+            cancelAnimationFrame(animationFrameId);
+
             sounds.background.pause();
             sounds.food.pause();
             sounds.hit.pause();
             sounds.item.pause();
             sounds.gameover.play();
+
             $('#game-over').removeClass('hidden');
             $('#timer-box').addClass('hidden');
             $('#score-box').addClass('hidden');
