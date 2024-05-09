@@ -145,6 +145,14 @@ const Item = function (ctx, gameArea, item) {
         ctx.globalAlpha = 1;
     };
 
+    const getX = function(){
+        return sprite.getXY().x;
+    };
+
+    const getY = function(){
+        return sprite.getXY().y;
+    };
+
     // Return the methods and properties as an object
     return {
         draw: draw,
@@ -153,6 +161,8 @@ const Item = function (ctx, gameArea, item) {
         getAngle: getAngle,
         setItem: setItem,
         randomize: randomize,
+        getX: getX,
+        getY: getY,
         sprite: function () {
             return sprite;
         }

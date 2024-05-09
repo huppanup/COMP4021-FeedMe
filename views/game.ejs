@@ -116,13 +116,12 @@
 
 
             // Collection detection
-            items = items.filter(item => {
+            for (let item of items) {
                 if (checkCollision(player, item)) {
                     player.score += item.score;
-                    return false;
+                    item.randomize(canvas);
                 }
-                return true;
-            })
+            }
 
             requestAnimationFrame(doFrame);
         }

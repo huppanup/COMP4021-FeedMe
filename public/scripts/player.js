@@ -161,6 +161,15 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         /* Update the sprite object */
         sprite.update(now);
     };
+
+    const getX = function() {
+        return sprite.getXY().x;
+    };
+
+    const getY = function() {
+        return sprite.getXY().y;
+    }
+
     // The methods are returned as an object here.
     return {
         playerID: playerID,
@@ -170,6 +179,8 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         slowDown: slowDown,
         getBoundingBox: sprite.getBoundingBox,
         draw: sprite.draw,
+        getX: getX,
+        getY: getY,
         update: update
     };
 };

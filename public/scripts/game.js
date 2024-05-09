@@ -34,10 +34,10 @@ function createItems(ctx, canvas) {
 
 // Game Logic
 function checkCollision(entity1, entity2) {
-    const dx = entity1.x - entity2.x;
-    const dy = entity1.y - entity2.y;
+    const dx = entity1.getX() - entity2.getX();
+    const dy = entity1.getY() - entity2.getY();
     const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance < entity1.size + entity2.size;
+    return distance < 64;
 }
 
 function handleKeyDownUp(player) {
