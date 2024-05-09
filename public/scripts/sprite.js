@@ -16,6 +16,12 @@ const Sprite = function(ctx, x, y) {
     // - `timing` - The timing for each sprite image
     // - `loop` - `true` if the sprite sequence is looped
     let sequence = { x: 0, y: 0, width: 20, height: 20, count: 1, timing: 0, loop: false };
+    // const setNewSequence = function(newSequence) {
+    //     sequence = newSequence;
+    //     index = 0;
+    //     lastUpdate = 0;
+    //     return this;
+    // }
 
     // This is the index indicating the current sprite image used in the sprite sequence.
     let index = 0;

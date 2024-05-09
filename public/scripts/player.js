@@ -165,13 +165,14 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             }
 
             /* Set the new position if it is within the game area */
-            const spriteSize = sprite.getBoundingBox();
-            const spriteWidth = spriteSize.width;
-            console.log("spriteWidth" + spriteWidth)
-            const spriteHeight = spriteSize.height;
-            console.log("spriteHeight" + spriteHeight)
+            // const spriteSize = sprite.getBoundingBox();
+            // const spriteWidth = spriteSize.width;
+            // console.log("spriteWidth" + spriteWidth) //128
+            // const spriteHeight = spriteSize.height;
+            // console.log("spriteHeight" + spriteHeight) //128
 
-            if (gameArea.isPointInBox(x + spriteWidth, y + spriteHeight))
+            if (gameArea.isPointInBox(x, y))
+                console.log(gameArea.isPointInBox(x, y))
                 sprite.setXY(x, y);
             }
 
