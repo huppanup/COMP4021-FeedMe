@@ -38,7 +38,10 @@ const Socket = (function() {
             }
         });
 
-        socket.on("start game " + code, () => {window.location.href = "/game"})
+        socket.on("start game " + code, () => {
+            // REDIRECTS TO GAME HERE!!
+            window.location.href = "/game/" + code;
+        });
     };
 
     const ready = function(){

@@ -66,11 +66,11 @@ app.get('/', (req, res) => {
     res.redirect("/login");
 })
 
-app.get('/game', (req, res) => {
+app.get('/game/:code?', (req, res) => {
     if (!req.session.user) {
-        return res.redirect("/game");
+        return res.redirect("/login");
     }
-
+    // You might want to send lobby info too, like below.
     res.render("game", {user : req.session.user});
 })
 
@@ -181,7 +181,7 @@ io.on("connection", (socket) => {
         for(id in players){
             if (!players[id].ready) startGame = false;
         }
-        if (startGame){io.emit("start game" + code);}
+        if (startGame){io.emit("start game " + code);}
         else {io.emit("updated lobby " + code, lobbies[code]);}
     });
 
