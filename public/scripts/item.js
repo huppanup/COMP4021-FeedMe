@@ -10,11 +10,11 @@ const Item = function (ctx, gameArea, item) {
     // Define the sprite sheet sequences for different items
     const sequences = {
         //Item For cheating
-        candy: { x: 0, y: 0, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        glass: { x: 0, y: 32, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        timer: { x: 0, y: 64, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        flake: { x: 0, y: 96, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        party: { x: 0, y: 128, width: 32, height: 32, count: 4, timing: 150, loop: true },
+        candy: { x: 0, y: 0, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        glass: { x: 0, y: 32, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        timer: { x: 0, y: 64, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        flake: { x: 0, y: 96, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        party: { x: 0, y: 128, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
 
         // Fruits with positive score
         cake: { x: 0, y: 132.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: 100 },
@@ -41,7 +41,7 @@ const Item = function (ctx, gameArea, item) {
     let sprite = itemSprite;
 
     const items = ['candy', 'glass', 'timer', 'flake', 'party'];
-    const foods = ['cake', 'berry', 'melon', 'orange', 'watermelon', 'poo', 'sign'];
+    const foods = ['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign'];
 
     // Function to set the item sequence
     const setItem = function (item) {
@@ -153,6 +153,15 @@ const Item = function (ctx, gameArea, item) {
         return sprite.getXY().y;
     };
 
+    const getScore = function() {
+        if (sequences[item] && sequences[item].score !== undefined) {
+            return sequences[item].score;
+        } else {
+            return 0;
+        }
+        //return sequences[item].score;
+    }
+
     // Return the methods and properties as an object
     return {
         draw: draw,
@@ -163,6 +172,7 @@ const Item = function (ctx, gameArea, item) {
         randomize: randomize,
         getX: getX,
         getY: getY,
+        getScore: getScore,
         sprite: function () {
             return sprite;
         }

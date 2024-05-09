@@ -1,6 +1,6 @@
 // This function defines the Player module.
 const Player = function(ctx, x, y, gameArea, playerType, playerID) {
-
+    let score = 0;
 
     // This is the sprite sequences of the player facing different directions.
     // It contains the idling sprite sequences `idleLeft`, `idleUp`, `idleRight` and `idleDown`,
@@ -12,6 +12,10 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             idleUp:    { x: 0, y: 0, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleRight: { x: 0, y: 128, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleDown:  { x: 0, y: 192, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpLeft: { x: 0, y: 64, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpRight: { x: 0, y: 128, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownLeft:   { x: 0, y: 64, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownRight:  { x: 0, y: 128, width: 32, height: 32, count: 3, timing: 2000, loop: false },
 
             /* Moving sprite sequences for facing different directions */
             moveLeft:  { x: 0, y: 64, width: 32, height: 32, count: 3, timing: 150, loop: true },
@@ -28,12 +32,20 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             idleUp:    { x: 0, y: 320, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleDown:  { x: 0, y: 512, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 2000, loop: false },
 
             /* Moving sprite sequences for facing different directions */
             moveLeft:  { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
             moveUp:    { x: 0, y: 320, width: 32, height: 32, count: 3, timing: 150, loop: true },
             moveRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
-            moveDown:  { x: 0, y: 512, width: 32, height: 32, count: 3, timing: 150, loop: true }
+            moveDown:  { x: 0, y: 512, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUpLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUpRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDownLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDownRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
         }
 
     };
@@ -136,7 +148,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
     // This function updates the player depending on his movement.
     // - `time` - The timestamp when this function is called
     const update = function(now) {
-        /* Update the player if the player is moving */
+    /* Update the player if the player is moving */
         if (direction != 0) {
             let { x, y } = sprite.getXY();
 
@@ -153,8 +165,13 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             }
 
             /* Set the new position if it is within the game area */
-            if (gameArea.isPointInBox(x, y))
-                //console.log("x: ", x, "y: ", y)
+            const spriteSize = sprite.getBoundingBox();
+            const spriteWidth = spriteSize.width;
+            console.log("spriteWidth" + spriteWidth)
+            const spriteHeight = spriteSize.height;
+            console.log("spriteHeight" + spriteHeight)
+
+            if (gameArea.isPointInBox(x + spriteWidth, y + spriteHeight))
                 sprite.setXY(x, y);
             }
 
@@ -170,6 +187,14 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         return sprite.getXY().y;
     }
 
+    const getScore = function(){
+        return score;
+    }
+
+    const updateScore = function(newScore) {
+        score += newScore;
+    }
+
     // The methods are returned as an object here.
     return {
         playerID: playerID,
@@ -181,6 +206,8 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         draw: sprite.draw,
         getX: getX,
         getY: getY,
-        update: update
+        update: update,
+        getScore: getScore,
+        updateScore: updateScore
     };
 };

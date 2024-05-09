@@ -43,7 +43,10 @@
             <span id="timer">Time: 60</span>
         </div>
 
-
+        <!-- Score -->
+        <div id="score-box" class="left-top score-text hidden">
+            <span id="score">Score: 0</span>
+        </div>
     </div>
     <div id="signin-overlay" class="overlay row"></div>
 
@@ -52,7 +55,6 @@
     <script src="/scripts/item.js"></script>
     <script src="/scripts/player.js"></script>
     <script src="/scripts/game.js"></script>
-    
 
     <script>
     const playersData = '<%- JSON.stringify(playersData) %>';
@@ -64,41 +66,26 @@
         const canvas = document.getElementById("game-area");
         const ctx = canvas.getContext("2d");
 
-        //set game-area size using container size
+        // Set canvas size using container size
         const container = $('#container');
-        const gameAreaCanvas = $('#game-area');
-        gameAreaCanvas.attr('width', container.width());
-        gameAreaCanvas.attr('height', container.height());
 
-        /* Create the items */
-        let items = []
-        items = createItems(ctx, canvas)
+        canvas.width = container.width();
+        canvas.height = container.height();
 
-        /* Create Players */
-        let player = []
-        player = createPlayers(JSON.parse(playersData), ctx, canvas);
+        // Create the items
+        let items = createItems(ctx, canvas);
 
-        // handle keydown/up event
+        // Create Players
+        let player = createPlayers(JSON.parse(playersData), ctx, canvas);
+
+        // Handle keydown/up events
         handleKeyDownUp(player);
 
         /* Main processing of the game */
         function doFrame(now) {
-            // Adjust the frame size dynamically
-            gameAreaCanvas.attr('width', container.width());
-            gameAreaCanvas.attr('height', container.height());
-
-            // if (gameStartTime == 0) gameStartTime = now;
-            //
-            // /* Update the time remaining */
-            // const gameTimeSoFar = now - gameStartTime;
-            // const timeRemaining = Math.ceil((totalGameTime * 1000 - gameTimeSoFar) / 1000);
-            // $("#timer").text(timeRemaining);
-            //
-            // // Game Over situation
-            // if (timeRemaining <= 0) {
-            //     // Game Over
-            //     endGame()
-            // }
+            // Update the canvas size dynamically
+            canvas.width = container.width();
+            canvas.height = container.height();
 
             // Update all items
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -110,15 +97,15 @@
                 item.draw();
             }
 
-            // Update the player;
+            // Update the player
             player.update(now);
             player.draw();
 
-
-            // Collection detection
+            // Collision detection
             for (let item of items) {
                 if (checkCollision(player, item)) {
-                    player.score += item.score;
+                    player.updateScore(item.getScore());
+                    $('#score').text('Score: ' + player.getScore());
                     item.randomize(canvas);
                 }
             }
@@ -126,19 +113,13 @@
             requestAnimationFrame(doFrame);
         }
 
-
         $(document).ready(function () {
-            // //set game-area size using container size
-            // const container = $('#container');
-            // const gameArea = $('#game-area');
-            // gameArea.attr('width', container.width());
-            // gameArea.attr('height', container.height());
-
             startCountdown();
             $('#restart-game').click(function () {
                 $('#results-box').addClass('hidden');
                 $('#game-over').addClass('hidden');
                 $('#timer-box').removeClass('hidden');
+                $('#score-box').removeClass('hidden');
                 $('#game-area').show();
                 startCountdown();
             });
@@ -151,6 +132,7 @@
             countdownElem.text(countdown);
             $('#game-start').show();
             $('#timer-box').addClass('hidden');
+            $('#score-box').addClass('hidden');
             $('#game-over').addClass('hidden');
             $('#results-box').addClass('hidden');
             $('#game-area').hide();
@@ -167,6 +149,7 @@
                     clearInterval(countdownInterval);
                     $('#game-start').hide();
                     $('#timer-box').removeClass('hidden');
+                    $('#score-box').removeClass('hidden');
                     $('#game-area').show();
                     startGame();
                 }
@@ -183,7 +166,7 @@
                     clearInterval(gameInterval);
                     endGame();
                 } else {
-                    //timeLeft--;
+                    timeLeft--;
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
@@ -191,15 +174,15 @@
             requestAnimationFrame(doFrame);
         }
 
-
         function endGame() {
             $('#game-over').removeClass('hidden');
             $('#timer-box').addClass('hidden');
+            $('#score-box').addClass('hidden');
             $('#game-area').hide();
 
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
-                //showResults();
+                // Show results or other actions here
             }, 2000);
         }
 
