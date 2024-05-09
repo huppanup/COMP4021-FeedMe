@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="container" class="col">
-        <canvas id="game-area" width="854" height="480"></canvas>
+        <canvas id="game-area"></canvas>
 
         <!-- Game Start Countdown -->
         <div id="game-start" class="center start-text">
@@ -43,6 +43,7 @@
             <span id="timer">Time: 60</span>
         </div>
 
+
     </div>
     <div id="signin-overlay" class="overlay row"></div>
 
@@ -57,29 +58,80 @@
         /* Get the canvas and 2D context */
         const canvas = document.getElementById("game-area");
         const ctx = canvas.getContext("2d");
-        console.log(canvas.width, canvas.height)
 
         const totalGameTime = 20;   // Total game time in seconds
         let gameStartTime = 0;      // The timestamp when the game starts
         let currentUserScore = 60;  // Current user's score
 
+
+        /* Create the items */
+        let items = [];
+        
         /* Set the ID here */ 
         const playerOneID = 0; // replace with real id 
-        const playerTwoID = 1; // replace with read id 
+        const playerTwoID = 1; // replace with read id
+
+        //set game-area size using container size
+        const container = $('#container');
+        const gameAreaCanvas = $('#game-area');
+        gameAreaCanvas.attr('width', container.width());
+        gameAreaCanvas.attr('height', container.height());
 
         /* Set the canvas width and height */
-        const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+        const gameArea = BoundingBox(ctx, 0, 0, gameAreaCanvas.width, gameAreaCanvas.height);
 
-        /* create players*/ 
-        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID); 
-        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID); 
+        /* create players*/
+        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID);
+        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID);
 
         /* Create the item sprites in the game */
-        const item = Item(ctx, gameArea, "candy")
+        function createItems(ctx, canvas) {
+            return [
+                Item(ctx, canvas, "candy"),
+                Item(ctx, canvas, "glass"),
+                Item(ctx, canvas, "timer"),
+                Item(ctx, canvas, "flake"),
+                Item(ctx, canvas, "party"),
+                Item(ctx, canvas, "cake"),
+                Item(ctx, canvas, "cherry"),
+                Item(ctx, canvas, "melon"),
+                Item(ctx, canvas, "orange"),
+                Item(ctx, canvas, "banana"),
+                Item(ctx, canvas, "poo"),
+                Item(ctx, canvas, "sign"),
+            ];
+        }
+        items.push(...createItems(ctx, canvas));
+        console.log(items)
+        // Add a variable to store the count of touched items for each type
+        const touchedItemsCount = {};
+        // Function to check if the player has touched an item
+        function checkPlayerTouchItem(player, items) {
+            // Get the player's bounding box
+            const playerBoundingBox = player.getBoundingBox();
+            // Iterate through the items
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                // Get the item's bounding box
+                const {x, y} = item.getXY(); 
+                // Check if the player's bounding box intersects with the item's bounding box
+                if (playerBoundingBox.isPointInBox(x,y)) {
+                    const itemType = item.getType();
+                    temp_score = item.getScore(); 
+                    currentUserScore += temp_score
+                    touchedItemsCount[itemType] = (touchedItemsCount[itemType] || 0) + 1;
+                    console.log(touchedItemsCount); 
+                    // Remove the touched item from the items array
+                    items.splice(i, 1);
+                    console.log(temp_score); 
+                    // Break out of the loop since the current item has been touched and removed
+                    break;
+                }
+            }
+        }
 
         /* Main processing of the game */
         function doFrame(now) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
             // if (gameStartTime == 0) gameStartTime = now;
             //
             // /* Update the time remaining */
@@ -93,16 +145,25 @@
             //     endGame()
             // }
             
-            // Update the player; 
-            playerOne.update(now); 
-            playerOne.draw(); 
 
-            playerTwo.update(now); 
-            playerTwo.draw(); 
-            // Update the item
-            item.update();
-            item.draw()
+            // Update all items
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let item of items) {
+                if (item.sprite().isAnimated()) { // Check if the sprite is animated
+                    item.update(now);
+                }
+                item.move(now, item.getAngle());
+                item.draw();
+            }
+            
+            // Update the player;
+            playerOne.update(now);
+            playerOne.draw();
 
+            checkPlayerTouchItem(playerOne, items); 
+            // playerTwo.update(now);
+            // playerTwo.draw();
+      
             requestAnimationFrame(doFrame);
         }
 
@@ -121,6 +182,12 @@
         ];
 
         $(document).ready(function () {
+            // //set game-area size using container size
+            // const container = $('#container');
+            // const gameArea = $('#game-area');
+            // gameArea.attr('width', container.width());
+            // gameArea.attr('height', container.height());
+
             startCountdown();
             $('#restart-game').click(function () {
                 $('#results-box').addClass('hidden');
@@ -169,13 +236,14 @@
                     clearInterval(gameInterval);
                     endGame();
                 } else {
-                    timeLeft--;
+                    //timeLeft--;
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
 
             requestAnimationFrame(doFrame);
         }
+
 
         function endGame() {
             $('#game-over').removeClass('hidden');
