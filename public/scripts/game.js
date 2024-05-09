@@ -37,7 +37,8 @@ function checkCollision(entity1, entity2) {
     const dx = entity1.getX() - entity2.getX();
     const dy = entity1.getY() - entity2.getY();
     const distance = Math.sqrt(dx * dx + dy * dy);
-    return distance < 64;
+
+    return distance < 64
 }
 // Check if cheatMode is on
 let cheatMode = false; 

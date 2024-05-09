@@ -89,6 +89,9 @@
         // Handle keydown/up events
         handleKeyDownUp(player);
 
+        // Set of correct item types
+        const correctItems = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
+
         /* Main processing of the game */
         function doFrame(now) {
             // Update the canvas size dynamically
@@ -112,6 +115,7 @@
             // Collision detection 
             for (let item of items) {
                 if (checkCollision(player, item)) {
+<<<<<<< HEAD
                     if (item.getScore() < 0) sounds.hit.play(); 
                     if (item.getScore() > 0) sounds.food.play(); 
                     if (item.getScore() == 0) sounds.item.play(); 
@@ -132,6 +136,14 @@
                         $('#score').text('Score: ' + player.getScore());
                         item.randomize(canvas);
                     }
+=======
+                    console.log(item.getItem())
+                    if (correctItems.has(item.getItem())) {
+                        player.updateScore(item.getScore());
+                        $('#score').text('Score: ' + player.getScore());
+                    }
+                    item.randomize(canvas);
+>>>>>>> feature/yeongmin
                 }
             }
 
