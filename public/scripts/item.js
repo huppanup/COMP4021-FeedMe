@@ -70,15 +70,14 @@ const Item = function (ctx, gameArea, item) {
 
     // Function to randomize the item sequence
     const randomizeItem = function () {
-        
+        /*
         const itemKeys = Object.keys(sequences);
         const randomKey = itemKeys[Math.floor(Math.random() * itemKeys.length)];
         setItem(randomKey);
         return randomKey;   
-        /*
+        */
         setItem(item); 
         return item; 
-        */
     };
 
     let realItemKey = item; 
