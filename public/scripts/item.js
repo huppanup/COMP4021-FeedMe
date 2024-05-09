@@ -52,7 +52,7 @@ const Item = function (ctx, gameArea, item) {
         } else if (foods.includes(item)) {
             sprite = foodSprite;
         }
-        sprite.setSequence(sequences[item], item);
+        sprite.setSequence(sequences[item]);
 
         if (item === 'flake' || item === 'timer') {
             sprite.setScale(3); // Set the scale to the desired value

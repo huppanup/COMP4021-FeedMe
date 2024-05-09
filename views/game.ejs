@@ -72,6 +72,8 @@
         canvas.width = container.width();
         canvas.height = container.height();
 
+        let animationFrameId;
+
         const sounds = {
             background: new Audio("/resources/background.mp3"),
             food: new Audio("/resources/food.mp3"),
@@ -112,38 +114,28 @@
             player.update(now);
             player.draw();
 
-            // Collision detection 
+            // Collision detection
             for (let item of items) {
                 if (checkCollision(player, item)) {
-<<<<<<< HEAD
-                    if (item.getScore() < 0) sounds.hit.play(); 
-                    if (item.getScore() > 0) sounds.food.play(); 
-                    if (item.getScore() == 0) sounds.item.play(); 
-                    const temp = checkCheat(); 
-                    if (temp){
-                        if (item.getScore() < 0){
-                            item.randomize(canvas);
-                        }
-                        else {
+                    console.log(item.getItem())
+                    if (correctItems.has(item.getItem())) {
+                        if (item.getScore() < 0) sounds.hit.play();
+                        if (item.getScore() > 0) sounds.food.play();
+                        if (item.getScore() === 0) sounds.item.play();
+
+                        const temp = checkCheat();
+                        if (temp){
+                            if (item.getScore() < 0){
+                                item.randomize(canvas);
+                            }
+                        } else {
                             player.updateScore(item.getScore());
                             $('#score').text('Score: ' + player.getScore());
                             item.randomize(canvas);
                         }
                     }
-                    else {
-                        player.updateScore(item.getScore());
-                        console.log(item.getScore()); 
-                        $('#score').text('Score: ' + player.getScore());
-                        item.randomize(canvas);
-                    }
-=======
-                    console.log(item.getItem())
-                    if (correctItems.has(item.getItem())) {
-                        player.updateScore(item.getScore());
-                        $('#score').text('Score: ' + player.getScore());
-                    }
                     item.randomize(canvas);
->>>>>>> feature/yeongmin
+
                 }
             }
 
@@ -198,27 +190,30 @@
 
             $('#timer').text('Time: ' + timeLeft);
             // Play Background Music
-            sounds.background.play(); 
+            sounds.background.play();
 
             const gameInterval = setInterval(() => {
                 if (timeLeft <= 0) {
                     clearInterval(gameInterval);
-                    endGame(); 
+                    endGame();
                 } else {
                     timeLeft--;
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
 
-            requestAnimationFrame(doFrame);
+            animationFrameId = requestAnimationFrame(doFrame);
         }
 
         function endGame() {
-            sounds.background.pause(); 
-            sounds.food.pause(); 
-            sounds.hit.pause(); 
-            sounds.item.pause(); 
-            sounds.gameover.play(); 
+            cancelAnimationFrame(animationFrameId);
+
+            sounds.background.pause();
+            sounds.food.pause();
+            sounds.hit.pause();
+            sounds.item.pause();
+            sounds.gameover.play();
+
             $('#game-over').removeClass('hidden');
             $('#timer-box').addClass('hidden');
             $('#score-box').addClass('hidden');
