@@ -117,11 +117,26 @@ body {
     cursor: pointer;
 }
 
+/* Player Panel */
 
-
-#game-users{
+#game-players{
+    display: flex;
+    flex-wrap: wrap;
     width: 75%;
 }
+
+.player-box{
+    width: 50%; height: 50%;
+    border: 2px solid var(--primary-color);
+}
+
+#p1{ border-left : none; border-top : none; }
+#p2{ border-right : none; border-top : none; }
+#p3{ border-left : none; border-bottom : none; }
+#p4{ border-right : none; border-bottom : none; }
+
+
+
 
 /* User Panel */
 #user-panel {
