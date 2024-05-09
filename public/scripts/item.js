@@ -155,6 +155,7 @@ const Item = function (ctx, gameArea, item) {
 
     const getScore = function() {
         if (sequences[item] && sequences[item].score !== undefined) {
+            console.log(item); 
             return sequences[item].score;
         } else {
             return 0;
