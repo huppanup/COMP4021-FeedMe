@@ -175,12 +175,23 @@ io.on("connection", (socket) => {
     });
 
     socket.on("ready", (code) => {
-        lobbies[code].players[user.id].ready = true;
-        io.emit("updated lobby " + code, lobbies[code]);
+        const players = lobbies[code].players;
+        players[user.id].ready = true;
+        let startGame = true;
+        for(id in players){
+            if (!players[id].ready) startGame = false;
+        }
+        if (startGame){io.emit("start game" + code);}
+        else {io.emit("updated lobby " + code, lobbies[code]);}
     });
 
     socket.on("cancel ready", (code) => {
         lobbies[code].players[user.id].ready = false;
+        io.emit("updated lobby " + code, lobbies[code]);
+    });
+
+    socket.on("change color", (code, color) =>{
+        lobbies[code].players[user.id].color = color;
         io.emit("updated lobby " + code, lobbies[code]);
     });
 

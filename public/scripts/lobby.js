@@ -5,7 +5,6 @@ const Lobby = (function() {
         lobby_code = code;
         lobby_state = lobby;
         GamePanel.initialize();
-        PlayerPanel.initialize();
 
         $("#ready").on('click', (e) => {
             e.preventDefault();
@@ -90,10 +89,16 @@ const PlayerPanel = (function(){
         const max_players = parseInt(Lobby.getLobbySettings().n_players);
         let i = 0;
         for (id in players){
-            $(`.player-box:eq(${i})`).html(`<div class="player player-content" id=${id}>${id}</div>`);
+            $(`.player-box:eq(${i})`).html(`<div class="player player-content" id=${id}>
+            <img style="width:50%;image-rendering: pixelated;" src="../resources/${players[id].color}.png">
+            <div class="username-label">${id}</div>
+            </div>`);
             if (players[id].ready){
                 $(`.player-box:eq(${i})`).append(`<div class="ready player-content" >READY</div>`);
+                continue;
             }
+
+            if (id == Authentication.getUser().id) addControls($(`.player-box:eq(${i})`));
             i++;
         }
         $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting player-content">Waiting...</div>');
@@ -101,19 +106,58 @@ const PlayerPanel = (function(){
         .html('<div class="player-content"><img class="no-user player-content" src="../resources/no_player.svg"></div>');
     };
 
+    const addControls = function(component){
+        const player = Lobby.getLobbyState().players[Authentication.getUser().id];
+        const left_colors = {"green":"blue", "blue":"orange", "orange":"green"};
+        const right_colors = {"green":"orange", "blue":"green", "orange":"blue"};
+
+        component.append(
+            `<div class="controls">
+            <div width="50%">
+            <button class="control" id="left"><img width="100%" src="../resources/button_left.svg" alt="Button Left"></button>
+            </div>
+            <div width="50%" style="text-align: right">
+            <button class="control" style="display: inline-block;" id="right">
+            <img width="100%" src="../resources/button_right.svg" alt="Button Right">
+            </button>
+            </div>
+            </div>`
+        );
+
+        $("#left").on("click", () => {
+            Socket.changeColor(left_colors[player.color]);
+        });
+
+        $("#right").on("click", () => {
+            Socket.changeColor(right_colors[player.color]);
+        });
+    }
+
+
+    const removeControls = function(){
+        $("#left").off("click");
+        $("#right").off("click");
+    }
     const updateUI = function(){
         const players = Lobby.getLobbyState().players;
         const max_players = parseInt(Lobby.getLobbySettings().n_players);
         let i = 0;
+        removeControls();
+        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting player-content">Waiting...</div>');
         for (id in players){
-            console.log(players);
-            $(`.player-box:eq(${i})`).html(`<div class="player player-content" id=${id}>${id}</div>`);
+            $(`.player-box:eq(${i})`).html(`<div class="player player-content" id=${id}>
+            <img style="width:50%;image-rendering: pixelated;" src="../resources/${players[id].color}.png">
+            <div class="username-label">${id}</div>
+            </div>`);
             if (players[id].ready){
                 $(`.player-box:eq(${i})`).append(`<div class="ready player-content" >READY</div>`);
+                continue;
+            }
+            if (id == Authentication.getUser().id){
+                addControls($(`.player-box:eq(${i})`));
             }
             i++;
         }
-        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting player-content">Waiting...</div>');
     };
 
     return {initialize, updateUI}

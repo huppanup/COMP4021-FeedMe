@@ -37,6 +37,8 @@ const Socket = (function() {
                 console.log("User " + response.user.id + " has entered lobby.");
             }
         });
+
+        socket.on("start game " + code, () => {window.location.href = "/game"})
     };
 
     const ready = function(){
@@ -59,15 +61,9 @@ const Socket = (function() {
 
     const changeColor = function(color){
         if (socket && socket.connected) {
-            socket.emit("change color", user, code, color);
+            socket.emit("change color", Lobby.getLobbyCode(), color);
         }
     };
-
-    const changeState = function(){
-        if (socket && socket.connected) {
-            socket.emit("change color", user, code, color);
-        }
-    }
 
     const disconnect = function() {
         leaveLobby(Lobby.getLobbyCode());
@@ -75,5 +71,5 @@ const Socket = (function() {
         socket = null;
     };
 
-    return { getSocket, connect, ready, cancelReady, leaveLobby, disconnect };
+    return { getSocket, connect, ready, cancelReady, changeColor, leaveLobby, disconnect };
 })();
