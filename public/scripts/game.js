@@ -40,6 +40,21 @@ function checkCollision(entity1, entity2) {
 
     return distance < 64
 }
+// Check if cheatMode is on
+let cheatMode = false; 
+
+function checkCheat(){
+    if (cheatMode) {
+        // Code for cheat mode
+        console.log("Cheat mode activated");
+        // Add your cheat mode logic here
+    } else {
+        // Code for normal mode
+        console.log("Normal mode");
+        // Add your normal mode logic here
+    }
+    return cheatMode; 
+}
 
 function handleKeyDownUp(player) {
     // Keep track of keys currently pressed down
@@ -76,6 +91,10 @@ function handleKeyDownUp(player) {
                 case 40: // Down
                     player.move(4);
                     break;
+                case 16: // Shift
+                    cheatMode = true;  
+                    player.speedUp(); 
+                    break; 
             }
         }
     });
@@ -113,12 +132,16 @@ function handleKeyDownUp(player) {
                     if (!keysDown[39]) player.stop(3);
                     if (keysDown[38]) player.move(2);
                     if (keysDown[40]) player.move(4);
-                    break;
+                    break;å
                 case 40: // Down
                     if (!keysDown[40]) player.stop(4);
                     if (keysDown[37]) player.move(1);
                     if (keysDown[39]) player.move(3);
                     break;
+                case 16: // Shift
+                    cheatMode = false; 
+                    player.slowDown(); 
+                    break; 
             }
         }
     });
