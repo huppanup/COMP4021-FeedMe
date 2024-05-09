@@ -55,6 +55,9 @@ Login/SignUp UI
 Enter/Create lobby UI
 ![FeedMe Enter Lobby Page](./public/resources/enterlobby_sample.png)
 
+Lobby UI
+![FeedMe Lobby Page](./public/resources/lobby_sample.png)
+
 Completed Tasks
 1. Login/Signup UI
 2. Backend for login/signup
@@ -62,9 +65,10 @@ Completed Tasks
 4. Enter/Create lobby overlay UI
 5. Logout(returns to login page)
 6. Enter/Create lobby backend
-
+7. Game lobby screen
+8. Leave game lobby
+9. Change avatars
+10. Redirect to game if everyone is ready
 
 Remaining Tasks(연우)
-1. Delete account(?)
-2. Game lobby screen
-3. Leave game lobby
+1. Show game guide

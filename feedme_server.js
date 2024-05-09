@@ -66,11 +66,11 @@ app.get('/', (req, res) => {
     res.redirect("/login");
 })
 
-app.get('/game', (req, res) => {
+app.get('/game/:code?', (req, res) => {
     if (!req.session.user) {
-        return res.redirect("/game");
+        return res.redirect("/login");
     }
-
+    // You might want to send lobby info too, like below.
     res.render("game", {user : req.session.user});
 })
 
@@ -78,8 +78,9 @@ app.get('/lobby/:code?', (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login");
     }
-
-    res.render("lobby", {code: req.params.code});
+    if (!lobbies[req.params.code]) return res.redirect("/login");
+    const lobby = JSON.stringify(lobbies[req.params.code], null, 0);
+    res.render("lobby", {code: req.params.code, lobby: lobby });
 })
 
 // POST
@@ -164,16 +165,37 @@ io.on("connection", (socket) => {
             if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
                 io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
             } else {
-                lobbies[code].players[user.id] = {color : "green"};
+                lobbies[code].players[user.id] = {color : "green", ready : false};
                 io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
+                io.emit("updated lobby " + code, lobbies[code]);
             }
         } else {
             io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} does not exist`});
         }  
     });
 
+    socket.on("ready", (code) => {
+        const players = lobbies[code].players;
+        players[user.id].ready = true;
+        let startGame = true;
+        for(id in players){
+            if (!players[id].ready) startGame = false;
+        }
+        if (startGame){io.emit("start game " + code);}
+        else {io.emit("updated lobby " + code, lobbies[code]);}
+    });
+
+    socket.on("cancel ready", (code) => {
+        lobbies[code].players[user.id].ready = false;
+        io.emit("updated lobby " + code, lobbies[code]);
+    });
+
+    socket.on("change color", (code, color) =>{
+        lobbies[code].players[user.id].color = color;
+        io.emit("updated lobby " + code, lobbies[code]);
+    });
+
     socket.on("leave lobby", (code) => {
-        console.log("Leaving lobby");
         if (!lobbies[code]) return;
         if (!lobbies[code].players[user.id]) return;
 
@@ -183,10 +205,10 @@ io.on("connection", (socket) => {
         if (Object.keys(lobbies[code].players).length == 0){
             console.log("Lobby "+ code + " empty, removing...");
             delete lobbies[code];
+        } else {
+            io.emit("updated lobby " + code, lobbies[code]);
         }
-        console.log(lobbies);
         io.emit("left lobby " + code, user);
-
     })
 
     socket.on("disconnect", () => {

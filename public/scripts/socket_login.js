@@ -37,42 +37,12 @@ const Socket = (function() {
         }
     }
 
-    const checkLeave = function(code){
-        if (socket && socket.connected) {
-            socket.on("left lobby " + code, (user) => {
-                if (user.id == Authentication.getUser().id) {window.location.href = "/"}
-                else {console.log("User " + user.id + " has left the lobby.")};
-            });
-        }
-    }
-
-    const checkEnter = function(code){
-        if (socket && socket.connected) {
-            socket.on("entered lobby " + code, (response) => {
-                if (response.status == 'success'){
-                    if (response.user.id == Authentication.getUser().id) console.log("You've entered the lobby!");
-                    else console.log("User " + response.user.id + " has entered lobby.");
-                }
-            });
-        }
-    }
-
-    const leaveLobby = function(code) {
-        if (socket && socket.connected) {
-            socket.emit("leave lobby", code);
-        }
-    }
-
-
 
     // This function disconnects the socket from the server
     const disconnect = function() {
-        try{
-            leaveLobby(Lobby.getLobbyCode());
-        } catch(e) {};
         socket.disconnect();
         socket = null;
     };
 
-    return { getSocket, connect, checkLeave, checkEnter, enterLobby, leaveLobby, disconnect };
+    return { getSocket, connect, enterLobby, disconnect };
 })();
