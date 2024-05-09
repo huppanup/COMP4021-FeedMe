@@ -39,9 +39,21 @@ const Socket = (function() {
         });
     };
 
-    const leaveLobby = function(code) {
+    const ready = function(){
         if (socket && socket.connected) {
-            socket.emit("leave lobby", code);
+            socket.emit("ready", Lobby.getLobbyCode());
+        }
+    }
+
+    const cancelReady = function(){
+        if (socket && socket.connected) {
+            socket.emit("cancel ready", Lobby.getLobbyCode());
+        }
+    }
+
+    const leaveLobby = function() {
+        if (socket && socket.connected) {
+            socket.emit("leave lobby", Lobby.getLobbyCode());
         }
     }
 
@@ -63,5 +75,5 @@ const Socket = (function() {
         socket = null;
     };
 
-    return { getSocket, connect, leaveLobby, disconnect };
+    return { getSocket, connect, ready, cancelReady, leaveLobby, disconnect };
 })();

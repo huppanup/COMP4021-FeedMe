@@ -165,7 +165,7 @@ io.on("connection", (socket) => {
             if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
                 io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
             } else {
-                lobbies[code].players[user.id] = {color : "green"};
+                lobbies[code].players[user.id] = {color : "green", ready : false};
                 io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
                 io.emit("updated lobby " + code, lobbies[code]);
             }
@@ -174,8 +174,17 @@ io.on("connection", (socket) => {
         }  
     });
 
+    socket.on("ready", (code) => {
+        lobbies[code].players[user.id].ready = true;
+        io.emit("updated lobby " + code, lobbies[code]);
+    });
+
+    socket.on("cancel ready", (code) => {
+        lobbies[code].players[user.id].ready = false;
+        io.emit("updated lobby " + code, lobbies[code]);
+    });
+
     socket.on("leave lobby", (code) => {
-        console.log("Leaving lobby");
         if (!lobbies[code]) return;
         if (!lobbies[code].players[user.id]) return;
 

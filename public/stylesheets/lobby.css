@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Abel&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Poetsen+One&display=swap');
 
 :root {
     --background: url('../resources/background.png');
@@ -127,9 +128,6 @@ body {
 
 .player-box{
     width: 50%; height: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     border: 2px solid var(--primary-color);
 }
 
@@ -138,8 +136,23 @@ body {
 #p3{ border-left : none; border-bottom : none; }
 #p4{ border-right : none; border-bottom : none; }
 
+.player-box .player-content{
+    width: 100%; height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player{ position:relative;}
+.ready{ 
+    width: 100%; height: 100%; 
+    background-color: rgba(255, 255, 255, 0.351); 
+    transform: translateY(-100%);
+    font-family: "Poetsen One", sans-serif;
+    font-size: 40px; color: var(--primary-color);
+}
 .waiting{ font-size: larger; color: var(--primary-color);}
-.no-user{ width : 50%; }
+.no-user{ width : 50% !important}
 
 /* User Panel */
 #user-panel {

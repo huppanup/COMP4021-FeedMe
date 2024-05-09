@@ -7,9 +7,23 @@ const Lobby = (function() {
         GamePanel.initialize();
         PlayerPanel.initialize();
 
+        $("#ready").on('click', (e) => {
+            e.preventDefault();
+            Socket.ready();
+            $("#ready").hide();
+            $("#cancel").show();
+        });
+
+        $("#cancel").on('click', (e) => {
+            e.preventDefault();
+            Socket.cancelReady();
+            $("#cancel").hide();
+            $("#ready").show();
+        });
+
         $("#leave-lobby").on('click', (e) => {
             e.preventDefault();
-            Socket.leaveLobby(code);
+            Socket.leaveLobby();
         });
     }
 
@@ -76,12 +90,15 @@ const PlayerPanel = (function(){
         const max_players = parseInt(Lobby.getLobbySettings().n_players);
         let i = 0;
         for (id in players){
-            $(`.player-box:eq(${i})`).html(`<div class="player" id=${id}>${id}</div>`);
+            $(`.player-box:eq(${i})`).html(`<div class="player player-content" id=${id}>${id}</div>`);
+            if (players[id].ready){
+                $(`.player-box:eq(${i})`).append(`<div class="ready player-content" >READY</div>`);
+            }
             i++;
         }
-        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting">Waiting...</div>');
+        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting player-content">Waiting...</div>');
         $('.player-box').slice(max_players)
-        .html('<img class="no-user" src="../resources/no_player.svg">');
+        .html('<div class="player-content"><img class="no-user player-content" src="../resources/no_player.svg"></div>');
     };
 
     const updateUI = function(){
@@ -89,10 +106,14 @@ const PlayerPanel = (function(){
         const max_players = parseInt(Lobby.getLobbySettings().n_players);
         let i = 0;
         for (id in players){
-            $(`.player-box:eq(${i})`).html(`<div class="player" id=${id}>${id}</div>`);
+            console.log(players);
+            $(`.player-box:eq(${i})`).html(`<div class="player player-content" id=${id}>${id}</div>`);
+            if (players[id].ready){
+                $(`.player-box:eq(${i})`).append(`<div class="ready player-content" >READY</div>`);
+            }
             i++;
         }
-        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting">Waiting...</div>');
+        $(`.player-box:lt(${max_players})`).slice(Object.keys(players).length).html('<div class="waiting player-content">Waiting...</div>');
     };
 
     return {initialize, updateUI}
