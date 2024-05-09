@@ -1,5 +1,6 @@
 // Define the `Item` object
 const Item = function (ctx, gameArea, item) {
+    let currentItem = item;
     // Create a sprite object using the Sprite module
     const itemSprite = Sprite(ctx, 0, 0);
     const foodSprite = Sprite(ctx, 0, 0);
@@ -45,12 +46,13 @@ const Item = function (ctx, gameArea, item) {
 
     // Function to set the item sequence
     const setItem = function (item) {
+        currentItem = item;
         if (items.includes(item)) {
             sprite = itemSprite;
         } else if (foods.includes(item)) {
             sprite = foodSprite;
         }
-        sprite.setSequence(sequences[item]);
+        sprite.setSequence(sequences[item], item);
 
         if (item === 'flake' || item === 'timer') {
             sprite.setScale(3); // Set the scale to the desired value
@@ -61,6 +63,10 @@ const Item = function (ctx, gameArea, item) {
         }
 
     };
+
+    const getItem = function(){
+        return currentItem;
+    }
 
     // Function to set the item sequence
     // const setItem = function (item) {
@@ -154,12 +160,12 @@ const Item = function (ctx, gameArea, item) {
     };
 
     const getScore = function() {
-        if (sequences[item] && sequences[item].score !== undefined) {
-            return sequences[item].score;
-        } else {
-            return 0;
-        }
-        //return sequences[item].score;
+        // if (sequences[currentItem] && sequences[currentItem].score !== undefined) {
+        //     return sequences[item].score;
+        // } else {
+        //     return 0;
+        // }
+        return sequences[currentItem]?.score || 0;
     }
 
     // Return the methods and properties as an object
@@ -169,6 +175,7 @@ const Item = function (ctx, gameArea, item) {
         move: move,
         getAngle: getAngle,
         setItem: setItem,
+        getItem: getItem,
         randomize: randomize,
         getX: getX,
         getY: getY,

@@ -81,6 +81,9 @@
         // Handle keydown/up events
         handleKeyDownUp(player);
 
+        // Set of correct item types
+        const correctItems = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
+
         /* Main processing of the game */
         function doFrame(now) {
             // Update the canvas size dynamically
@@ -104,8 +107,11 @@
             // Collision detection
             for (let item of items) {
                 if (checkCollision(player, item)) {
-                    player.updateScore(item.getScore());
-                    $('#score').text('Score: ' + player.getScore());
+                    console.log(item.getItem())
+                    if (correctItems.has(item.getItem())) {
+                        player.updateScore(item.getScore());
+                        $('#score').text('Score: ' + player.getScore());
+                    }
                     item.randomize(canvas);
                 }
             }
