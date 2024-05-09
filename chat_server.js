@@ -130,7 +130,9 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         const user = socket.request.session.user;
-        if (user) delete onlineUsers[user.username];
+        if (user) {
+            delete onlineUsers[user.username];
+        }
         io.emit("remove user", JSON.stringify({username: user.username, avatar : user.avatar, name : user.name}));
     })
 

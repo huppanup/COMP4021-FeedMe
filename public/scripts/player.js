@@ -43,7 +43,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
     const playerSequences = sequences[playerType];
     // The sprite object is configured for the player sprite here.
     sprite.setSequence(playerSequences.idleUp)
-          .setScale(2)
+          .setScale(4)
           .setShadowScale({ x: 0.75, y: 0.20 })
           .useSheet("/resources/blob_sprite.png");
 

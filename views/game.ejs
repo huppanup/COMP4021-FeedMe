@@ -54,22 +54,14 @@
     
 
     <script>
+    const playersData = '<%- JSON.stringify(playersData) %>';
+    const settings = '<%- JSON.stringify(settings) %>';
+    const user = '<%- JSON.stringify(user) %>';
+
     $(function() {
         /* Get the canvas and 2D context */
         const canvas = document.getElementById("game-area");
         const ctx = canvas.getContext("2d");
-
-        const totalGameTime = 20;   // Total game time in seconds
-        let gameStartTime = 0;      // The timestamp when the game starts
-        let currentUserScore = 60;  // Current user's score
-
-
-        /* Create the items */
-        let items = [];
-        
-        /* Set the ID here */ 
-        const playerOneID = 0; // replace with real id 
-        const playerTwoID = 1; // replace with read id
 
         //set game-area size using container size
         const container = $('#container');
@@ -77,12 +69,36 @@
         gameAreaCanvas.attr('width', container.width());
         gameAreaCanvas.attr('height', container.height());
 
-        /* Set the canvas width and height */
+        const totalGameTime = 20;   // Total game time in seconds
+        let gameStartTime = 0;      // The timestamp when the game starts
+        let currentUserScore = 60;  // Current user's score
+
+        /* Create the items */
+        let items = [];
+
+        /* Create Players */
         const gameArea = BoundingBox(ctx, 0, 0, gameAreaCanvas.width, gameAreaCanvas.height);
 
-        /* create players*/
-        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID);
-        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID);
+        let players = [];
+        let playerIds = Object.keys(JSON.parse(playersData));
+        //console.log(playerIds)
+        let gameTime = JSON.parse(settings).time
+        //console.log("gameTime: ", gameTime)
+
+        for (let i = 0; i < playerIds; i++) {
+            let playerId = playerIds[i];
+            console.log("playerId: ", playerId)
+
+            let playerColor = playersData[playerId].color;
+            console.log("playerColor: ", playerColor)
+
+            // starting position of the players will be randomized
+            let playerX = Math.floor(Math.random() * gameAreaCanvas.width);
+            let playerY = Math.floor(Math.random() * gameAreaCanvas.height);
+
+            players.push(Player(ctx, playerX, playerY, gameArea, playerColor, playerId));
+        }
+
 
         /* Create the item sprites in the game */
         function createItems(ctx, canvas) {
@@ -130,8 +146,8 @@
             }
 
             // Update the player;
-            playerOne.update(now);
-            playerOne.draw();
+            // playerOne.update(now);
+            // playerOne.draw();
 
             // playerTwo.update(now);
             // playerTwo.draw();
@@ -139,19 +155,7 @@
             requestAnimationFrame(doFrame);
         }
 
-        // User-defined
-        const user = {
-            name: '<?= $user->name ?>',
-            id: '<?= $user->id ?>',
-            socketId: '<?= $user->socket_id ?>'
-        };
 
-        // Placeholder for other users' scores
-        const otherUsers = [
-            { name: 'Player 1', score: 45 },
-            { name: 'Player 2', score: 52 },
-            { name: 'Player 3', score: 38 },
-        ];
 
         $(document).ready(function () {
             // //set game-area size using container size

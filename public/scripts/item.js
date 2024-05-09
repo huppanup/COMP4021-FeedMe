@@ -52,7 +52,6 @@ const Item = function (ctx, gameArea, item) {
         }
         sprite.setSequence(sequences[item]);
 
-
         if (item === 'flake' || item === 'timer') {
             sprite.setScale(3); // Set the scale to the desired value
         } else if (item === 'glass') {
