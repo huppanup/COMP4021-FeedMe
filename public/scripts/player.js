@@ -1,5 +1,6 @@
 // This function defines the Player module.
 const Player = function(ctx, x, y, gameArea, playerType, playerID) {
+    let score = 0;
 
     // This is the sprite sequences of the player facing different directions.
     // It contains the idling sprite sequences `idleLeft`, `idleUp`, `idleRight` and `idleDown`,
@@ -11,6 +12,10 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             idleUp:    { x: 0, y: 0, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleRight: { x: 0, y: 128, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleDown:  { x: 0, y: 192, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpLeft: { x: 0, y: 64, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpRight: { x: 0, y: 128, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownLeft:   { x: 0, y: 64, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownRight:  { x: 0, y: 128, width: 32, height: 32, count: 3, timing: 2000, loop: false },
 
             /* Moving sprite sequences for facing different directions */
             moveLeft:  { x: 0, y: 64, width: 32, height: 32, count: 3, timing: 150, loop: true },
@@ -27,12 +32,20 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             idleUp:    { x: 0, y: 320, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 2000, loop: false },
             idleDown:  { x: 0, y: 512, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 2000, loop: false },
 
             /* Moving sprite sequences for facing different directions */
             moveLeft:  { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
             moveUp:    { x: 0, y: 320, width: 32, height: 32, count: 3, timing: 150, loop: true },
             moveRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
-            moveDown:  { x: 0, y: 512, width: 32, height: 32, count: 3, timing: 150, loop: true }
+            moveDown:  { x: 0, y: 512, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUpLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUpRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDownLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDownRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
         }
 
     };
@@ -42,7 +55,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
     const playerSequences = sequences[playerType];
     // The sprite object is configured for the player sprite here.
     sprite.setSequence(playerSequences.idleUp)
-          .setScale(2)
+          .setScale(4)
           .setShadowScale({ x: 0.75, y: 0.20 })
           .useSheet("/resources/blob_sprite.png");
 
@@ -124,18 +137,18 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 };
     // This function speeds up the player.
     const speedUp = function() {
-        speed = 250;
+        speed = 400;
     };
 
     // This function slows down the player.
     const slowDown = function() {
-        speed = 150;
+        speed = 250;
     };
 
     // This function updates the player depending on his movement.
     // - `time` - The timestamp when this function is called
-    const update = function(time) {
-        /* Update the player if the player is moving */
+    const update = function(now) {
+    /* Update the player if the player is moving */
         if (direction != 0) {
             let { x, y } = sprite.getXY();
 
@@ -152,13 +165,37 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             }
 
             /* Set the new position if it is within the game area */
+            // const spriteSize = sprite.getBoundingBox();
+            // const spriteWidth = spriteSize.width;
+            // console.log("spriteWidth" + spriteWidth) //128
+            // const spriteHeight = spriteSize.height;
+            // console.log("spriteHeight" + spriteHeight) //128
+
             if (gameArea.isPointInBox(x, y))
+                console.log(gameArea.isPointInBox(x, y))
                 sprite.setXY(x, y);
-        }
+            }
 
         /* Update the sprite object */
-        sprite.update(time);
+        sprite.update(now);
     };
+
+    const getX = function() {
+        return sprite.getXY().x;
+    };
+
+    const getY = function() {
+        return sprite.getXY().y;
+    }
+
+    const getScore = function(){
+        return score;
+    }
+
+    const updateScore = function(newScore) {
+        score += newScore;
+    }
+
     // The methods are returned as an object here.
     return {
         playerID: playerID,
@@ -168,6 +205,10 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         slowDown: slowDown,
         getBoundingBox: sprite.getBoundingBox,
         draw: sprite.draw,
-        update: update
+        getX: getX,
+        getY: getY,
+        update: update,
+        getScore: getScore,
+        updateScore: updateScore
     };
 };

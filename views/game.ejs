@@ -44,7 +44,10 @@
             <span id="timer">Time: 60</span>
         </div>
 
-
+        <!-- Score -->
+        <div id="score-box" class="left-top score-text hidden">
+            <span id="score">Score: 0</span>
+        </div>
     </div>
     <div id="signin-overlay" class="overlay row"></div>
 
@@ -52,72 +55,51 @@
     <script src="/scripts/sprite.js"></script>
     <script src="/scripts/item.js"></script>
     <script src="/scripts/player.js"></script>
-    
+    <script src="/scripts/game.js"></script>
 
     <script>
+    const playersData = '<%- JSON.stringify(playersData) %>';
+    const settings = '<%- JSON.stringify(settings) %>';
+    const user = '<%- JSON.stringify(user) %>';
+
     $(function() {
         /* Get the canvas and 2D context */
         const canvas = document.getElementById("game-area");
         const ctx = canvas.getContext("2d");
 
-        const totalGameTime = 20;   // Total game time in seconds
-        let gameStartTime = 0;      // The timestamp when the game starts
-        let currentUserScore = 60;  // Current user's score
+        // Set canvas size using container size
+        const container = $('#container');
 
+        canvas.width = container.width();
+        canvas.height = container.height();
 
+        let animationFrameId;
 
-        /* Create the items */
-        let items = [];
-        
-        /* Set the ID here */ 
-        const playerOneID = 0; // replace with real id 
-        const playerTwoID = 1; // replace with read id 
+        const sounds = {
+            background: new Audio("/resources/background.mp3"),
+            food: new Audio("/resources/food.mp3"),
+            item: new Audio("/resources/collect.mp3"),
+            hit: new Audio("/resources/hit.mp3"),
+            gameover: new Audio("/resources/gameover.mp3")
+        };
 
-        /* Set the canvas width and height */
-        const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+        // Create the items
+        let items = createItems(ctx, canvas);
 
-        /* create players*/ 
-        const playerOne = Player(ctx, 200, 200, gameArea, 'green', playerOneID); 
-        const playerTwo = Player(ctx, 300, 300, gameArea, 'blue', playerTwoID); 
+        // Create Players
+        let player = createPlayers(JSON.parse(playersData), ctx, canvas);
 
-        /* Create the item sprites in the game */
-        function createItems(ctx, canvas) {
-            return [
-                Item(ctx, canvas, "candy"),
-                Item(ctx, canvas, "glass"),
-                Item(ctx, canvas, "timer"),
-                Item(ctx, canvas, "flask"),
-                Item(ctx, canvas, "party"),
-                Item(ctx, canvas, "cake"),
-                Item(ctx, canvas, "cherry"),
-                Item(ctx, canvas, "melon"),
-                Item(ctx, canvas, "orange"),
-                Item(ctx, canvas, "banana"),
-                Item(ctx, canvas, "poo"),
-                Item(ctx, canvas, "sign"),
-            ];
-        }
-        items.push(...createItems(ctx, canvas));
+        // Handle keydown/up events
+        handleKeyDownUp(player);
+
+        // Set of correct item types
+        const correctItems = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
 
         /* Main processing of the game */
         function doFrame(now) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // if (gameStartTime == 0) gameStartTime = now;
-            //
-            // /* Update the time remaining */
-            // const gameTimeSoFar = now - gameStartTime;
-            // const timeRemaining = Math.ceil((totalGameTime * 1000 - gameTimeSoFar) / 1000);
-            // $("#timer").text(timeRemaining);
-            //
-            // // Game Over situation
-            // if (timeRemaining <= 0) {
-            //     // Game Over
-            //     endGame()
-            // }
-            
-            // Update the player; 
-            playerOne.update(now); 
-            playerOne.draw(); 
+            // Update the canvas size dynamically
+            canvas.width = container.width();
+            canvas.height = container.height();
 
             // Update all items
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -129,38 +111,45 @@
                 item.draw();
             }
 
-            playerTwo.update(now); 
-            playerTwo.draw(); 
-      
+            // Update the player
+            player.update(now);
+            player.draw();
+
+            // Collision detection
+            for (let item of items) {
+                if (checkCollision(player, item)) {
+                    console.log(item.getItem())
+                    if (correctItems.has(item.getItem())) {
+                        if (item.getScore() < 0) sounds.hit.play();
+                        if (item.getScore() > 0) sounds.food.play();
+                        if (item.getScore() === 0) sounds.item.play();
+
+                        const temp = checkCheat();
+                        if (temp){
+                            if (item.getScore() < 0){
+                                item.randomize(canvas);
+                            }
+                        } else {
+                            player.updateScore(item.getScore());
+                            $('#score').text('Score: ' + player.getScore());
+                            item.randomize(canvas);
+                        }
+                    }
+                    item.randomize(canvas);
+
+                }
+            }
+
             requestAnimationFrame(doFrame);
         }
 
-        // User-defined
-        const user = {
-            name: '<?= $user->name ?>',
-            id: '<?= $user->id ?>',
-            socketId: '<?= $user->socket_id ?>'
-        };
-
-        // Placeholder for other users' scores
-        const otherUsers = [
-            { name: 'Player 1', score: 45 },
-            { name: 'Player 2', score: 52 },
-            { name: 'Player 3', score: 38 },
-        ];
-
         $(document).ready(function () {
-            //set game-area size using container size
-            const container = $('#container');
-            const gameArea = $('#game-area');
-            gameArea.attr('width', container.width());
-            gameArea.attr('height', container.height());
-
             startCountdown();
             $('#restart-game').click(function () {
                 $('#results-box').addClass('hidden');
                 $('#game-over').addClass('hidden');
                 $('#timer-box').removeClass('hidden');
+                $('#score-box').removeClass('hidden');
                 $('#game-area').show();
                 startCountdown();
             });
@@ -173,6 +162,7 @@
             countdownElem.text(countdown);
             $('#game-start').show();
             $('#timer-box').addClass('hidden');
+            $('#score-box').addClass('hidden');
             $('#game-over').addClass('hidden');
             $('#results-box').addClass('hidden');
             $('#game-area').hide();
@@ -189,6 +179,7 @@
                     clearInterval(countdownInterval);
                     $('#game-start').hide();
                     $('#timer-box').removeClass('hidden');
+                    $('#score-box').removeClass('hidden');
                     $('#game-area').show();
                     startGame();
                 }
@@ -196,122 +187,46 @@
         }
 
         function startGame() {
-            let timeLeft = 10;
+            let timeLeft = JSON.parse(settings).time;
+
             $('#timer').text('Time: ' + timeLeft);
+            // Play Background Music
+            sounds.background.play();
 
             const gameInterval = setInterval(() => {
                 if (timeLeft <= 0) {
                     clearInterval(gameInterval);
                     endGame();
                 } else {
-                    //timeLeft--;
+                    timeLeft--;
                     $('#timer').text('Time: ' + timeLeft);
                 }
             }, 1000);
 
-            requestAnimationFrame(doFrame);
+            animationFrameId = requestAnimationFrame(doFrame);
         }
 
-
         function endGame() {
+            cancelAnimationFrame(animationFrameId);
+
+            sounds.background.pause();
+            sounds.food.pause();
+            sounds.hit.pause();
+            sounds.item.pause();
+            sounds.gameover.play();
+
             $('#game-over').removeClass('hidden');
             $('#timer-box').addClass('hidden');
+            $('#score-box').addClass('hidden');
             $('#game-area').hide();
 
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
-                //showResults();
+                // Show results or other actions here
             }, 2000);
         }
-        /* Get the current user's ID */
-        //    const currentUserID = Authentication.getCurrentUser().id;
 
-        /* Check if the player ID matches the current user's ID */
-        //if (player.id === currentUserID)
-        // Keep track of keys currently pressed down
-        let keysDown = {};
-
-        gameArea.attr('width', container.width());
-        gameArea.attr('height', container.height());
-
-        // Add keydown event listener
-        $(document).on("keydown", function(event) {
-            // Add key to keysDown object if it's an arrow key
-            if (event.keyCode >= 37 && event.keyCode <= 40) {
-                keysDown[event.keyCode] = true;
-            }
-
-            // Check for diagonal movement
-            if (keysDown[37] && keysDown[38]) { // Up-Left
-                playerOne.move(5);
-            } else if (keysDown[38] && keysDown[39]) { // Up-Right
-                playerOne.move(6);
-            } else if (keysDown[39] && keysDown[40]) { // Down-Right
-                playerOne.move(8);
-            } else if (keysDown[40] && keysDown[37]) { // Down-Left
-                playerOne.move(7);
-            } else {
-                // Handle non-diagonal movement
-                switch (event.keyCode) {
-                    case 37: // Left
-                        playerOne.move(1);
-                        break;
-                    case 38: // Up
-                        playerOne.move(2);
-                        break;
-                    case 39: // Right
-                        playerOne.move(3);
-                        break;
-                    case 40: // Down
-                        playerOne.move(4);
-                        break;
-                }
-            }
-        });
-
-                // Add keyup event listener
-        $(document).on("keyup", function(event) {
-            // Remove key from keysDown object if it's an arrow key
-            if (event.keyCode >= 37 && event.keyCode <= 40) {
-                delete keysDown[event.keyCode];
-            }
-
-            // Check for diagonal movement
-            if (keysDown[37] && keysDown[38]) { // Up-Left
-                playerOne.move(5);
-            } else if (keysDown[38] && keysDown[39]) { // Up-Right
-                playerOne.move(6);
-            } else if (keysDown[39] && keysDown[40]) { // Down-Right
-                playerOne.move(7);
-            } else if (keysDown[40] && keysDown[37]) { // Down-Left
-                playerOne.move(8);
-            } else {
-                // Handle non-diagonal movement
-                switch (event.keyCode) {
-                    case 37: // Left
-                        if (!keysDown[37]) playerOne.stop(1);
-                        if (keysDown[38]) playerOne.move(2);
-                        if (keysDown[40]) playerOne.move(4);
-                        break;
-                    case 38: // Up
-                        if (!keysDown[38]) playerOne.stop(2);
-                        if (keysDown[37]) playerOne.move(1);
-                        if (keysDown[39]) playerOne.move(3);
-                        break;
-                    case 39: // Right
-                        if (!keysDown[39]) playerOne.stop(3);
-                        if (keysDown[38]) playerOne.move(2);
-                        if (keysDown[40]) playerOne.move(4);
-                        break;
-                    case 40: // Down
-                        if (!keysDown[40]) playerOne.stop(4);
-                        if (keysDown[37]) playerOne.move(1);
-                        if (keysDown[39]) playerOne.move(3);
-                        break;
-                }
-            }
-        });
-    }); 
+    });
     </script>
 </body>
 </html>

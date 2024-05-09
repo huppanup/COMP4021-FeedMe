@@ -14,6 +14,7 @@ const BoundingBox = function(ctx, top, left, bottom, right) {
     // intersection of a point or a box against this
     // bounding box.
     const path = new Path2D();
+    //console.log(top, left, bottom, right)
     path.rect(left, top, right - left, bottom - top);
 
     // This function gets the top side of the bounding box.
@@ -49,7 +50,9 @@ const BoundingBox = function(ctx, top, left, bottom, right) {
     // This function tests whether a point is in the bounding box.
     // - `x`, `y` - The (x, y) position to be tested
     const isPointInBox = function(x, y) {
-        return ctx.isPointInPath(path, x, y);
+        // Check if the point is within the game area
+        return x >= 0 && x <= right-left && y >= 0 && y <= bottom-top;
+        //return ctx.isPointInPath(path, x, y);
     };
 
     // This function checks whether the two bounding boxes intersect.

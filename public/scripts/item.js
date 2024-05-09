@@ -1,5 +1,6 @@
 // Define the `Item` object
 const Item = function (ctx, gameArea, item) {
+    let currentItem = item;
     // Create a sprite object using the Sprite module
     const itemSprite = Sprite(ctx, 0, 0);
     const foodSprite = Sprite(ctx, 0, 0);
@@ -10,11 +11,11 @@ const Item = function (ctx, gameArea, item) {
     // Define the sprite sheet sequences for different items
     const sequences = {
         //Item For cheating
-        candy: { x: 0, y: 0, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        glass: { x: 0, y: 32, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        timer: { x: 0, y: 64, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        flake: { x: 0, y: 96, width: 32, height: 32, count: 4, timing: 150, loop: true },
-        party: { x: 0, y: 128, width: 32, height: 32, count: 4, timing: 150, loop: true },
+        candy: { x: 0, y: 0, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        glass: { x: 0, y: 32, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        timer: { x: 0, y: 64, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        flake: { x: 0, y: 96, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
+        party: { x: 0, y: 128, width: 32, height: 32, count: 4, timing: 150, loop: true, score: 0 },
 
         // Fruits with positive score
         cake: { x: 0, y: 132.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: 100 },
@@ -30,28 +31,42 @@ const Item = function (ctx, gameArea, item) {
 
     // Initialize the sprite object with the sprite sheet
     itemSprite.useSheet("/resources/item_sprites.png")
-        .setSequence(sequences[item])
-        .setScale(5);
+        .setSequence(sequences[item]);
+        //.setScale(2);
 
     foodSprite.useSheet("/resources/fruit_sprites.png")
-        .setSequence(sequences[item])
-        .setScale(3);
+        .setSequence(sequences[item]);
+        //.setScale(2);
 
     // Set the active sprite
     let sprite = itemSprite;
 
     const items = ['candy', 'glass', 'timer', 'flake', 'party'];
-    const foods = ['cake', 'berry', 'melon', 'orange', 'watermelon', 'poo', 'sign'];
+    const foods = ['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign'];
 
     // Function to set the item sequence
     const setItem = function (item) {
+        currentItem = item;
         if (items.includes(item)) {
             sprite = itemSprite;
         } else if (foods.includes(item)) {
             sprite = foodSprite;
         }
         sprite.setSequence(sequences[item]);
+
+        if (item === 'flake' || item === 'timer') {
+            sprite.setScale(3); // Set the scale to the desired value
+        } else if (item === 'glass') {
+            sprite.setScale(4); // Reset the scale for other items
+        } else {
+            sprite.setScale(2); // Reset the scale for other items
+        }
+
     };
+
+    const getItem = function(){
+        return currentItem;
+    }
 
     // Function to set the item sequence
     // const setItem = function (item) {
@@ -67,7 +82,7 @@ const Item = function (ctx, gameArea, item) {
 
     // Function to randomize the position of the item
     const randomize = function (area) {
-        console.log(area.width, area.height)
+        //console.log(area.width, area.height)
         // Randomize the starting point (boundary)
         const boundary = Math.floor(Math.random() * 4);
         let x, y;
@@ -94,7 +109,7 @@ const Item = function (ctx, gameArea, item) {
                 angle = Math.random() * Math.PI; // Move upwards
                 break;
         }
-        console.log(x, y)
+        //console.log(x, y)
 
         // Randomize the item sequence
         randomizeItem();
@@ -136,6 +151,23 @@ const Item = function (ctx, gameArea, item) {
         ctx.globalAlpha = 1;
     };
 
+    const getX = function(){
+        return sprite.getXY().x;
+    };
+
+    const getY = function(){
+        return sprite.getXY().y;
+    };
+
+    const getScore = function() {
+        // if (sequences[currentItem] && sequences[currentItem].score !== undefined) {
+        //     return sequences[item].score;
+        // } else {
+        //     return 0;
+        // }
+        return sequences[currentItem]?.score || 0;
+    }
+
     // Return the methods and properties as an object
     return {
         draw: draw,
@@ -143,7 +175,11 @@ const Item = function (ctx, gameArea, item) {
         move: move,
         getAngle: getAngle,
         setItem: setItem,
+        getItem: getItem,
         randomize: randomize,
+        getX: getX,
+        getY: getY,
+        getScore: getScore,
         sprite: function () {
             return sprite;
         }

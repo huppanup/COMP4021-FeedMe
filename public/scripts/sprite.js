@@ -17,6 +17,8 @@ const Sprite = function(ctx, x, y) {
     // - `loop` - `true` if the sprite sequence is looped
     let sequence = { x: 0, y: 0, width: 20, height: 20, count: 1, timing: 0, loop: false };
 
+    let currentSequenceName = '';
+
     // This is the index indicating the current sprite image used in the sprite sequence.
     let index = 0;
 
@@ -44,6 +46,10 @@ const Sprite = function(ctx, x, y) {
         return sheet.complete && sheet.naturalHeight != 0;
     };
 
+    const getSequenceName = function() {
+        return currentSequenceName;
+    }
+
     // This function gets the current sprite position.
     const getXY = function() {
         return {x, y};
@@ -54,16 +60,18 @@ const Sprite = function(ctx, x, y) {
     // - `yvalue` - The new y position
     const setXY = function(xvalue, yvalue) {
         [x, y] = [xvalue, yvalue];
-        console.log(x, y)
+        //console.log(x, y)
         return this;
     };
 
     // This function sets the sprite sequence.
     // - `newSequence` - The new sprite sequence to be used by the sprite
-    const setSequence = function(newSequence) {
+    const setSequence = function(newSequence, itemName) {
         sequence = newSequence;
         index = 0;
         lastUpdate = 0;
+
+        currentSequenceName = itemName;
         return this;
     };
 
@@ -97,12 +105,16 @@ const Sprite = function(ctx, x, y) {
         const size = getDisplaySize();
 
         /* Find the box coordinates */
-        const top = y - size.height / 2;
-        const left = x - size.width / 2;
-        const bottom = y + size.height / 2;
-        const right = x + size.width / 2;
+        const top = y;
+        const left = x ;
+        const bottom = y + size.height;
+        const right = x + size.width;
 
-        return BoundingBox(ctx, top, left, bottom, right);
+        return {
+            box: BoundingBox(ctx, top, left, bottom, right),
+            width: size.width,
+            height: size.height
+        };
     };
 
     // This function draws shadow underneath the sprite.
@@ -207,6 +219,7 @@ const Sprite = function(ctx, x, y) {
         getDisplaySize: getDisplaySize,
         getBoundingBox: getBoundingBox,
         isReady: isReady,
+        getSequenceName: getSequenceName,
         draw: draw,
         update: update,
         isAnimated: isAnimated
