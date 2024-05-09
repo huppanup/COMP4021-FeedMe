@@ -91,11 +91,31 @@
         // Handle keydown/up events
         handleKeyDownUp(player);
 
-        // Set of correct item types
-        const correctItems = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
+        // Set for eatCandy 
+        let eatCandy = false; 
 
+        // Set for timeLeft
+        let timeLeft = JSON.parse(settings).time; 
+        let gameStartTime = 0;      // The timestamp when the game starts
+
+        // Set of correct item types
+        const correctFruits = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
+        const correctItems = new Set(['candy', 'glass', 'timer', 'flake','party']);
         /* Main processing of the game */
         function doFrame(now) {
+            if (gameStartTime == 0) gameStartTime = now; 
+            /* Update the time remaining */
+            const gameTimeSoFar = now - gameStartTime;
+            const timeRemaining = Math.ceil((timeLeft * 1000 - gameTimeSoFar) / 1000);
+            $('#timer').text('Time: ' + timeRemaining);
+
+            if(timeRemaining <= 0)  {
+                clearInterval(doFrame);
+                endGame();
+                return; 
+            } 
+            // Play Background Music
+            sounds.background.play();
             // Update the canvas size dynamically
             canvas.width = container.width();
             canvas.height = container.height();
@@ -114,24 +134,42 @@
             player.update(now);
             player.draw();
 
+            // let eatCandy false when 5s ends 
+            const resetEatCandy = () =>{eatCandy = false};
+
             // Collision detection
             for (let item of items) {
                 if (checkCollision(player, item)) {
                     console.log(item.getItem())
-                    if (correctItems.has(item.getItem())) {
+                    if (correctFruits.has(item.getItem())) {
                         if (item.getScore() < 0) sounds.hit.play();
                         if (item.getScore() > 0) sounds.food.play();
-                        if (item.getScore() === 0) sounds.item.play();
-
-                        const temp = checkCheat();
-                        if (temp){
+                        const IsCheat = checkCheat();
+                        console.log("eatCandy:", eatCandy)
+                        if (IsCheat || eatCandy){
                             if (item.getScore() < 0){
+                                item.randomize(canvas);
+                            } else { // allow update of score when isCheat and fruit score > 0
+                                player.updateScore(item.getScore());
+                                $('#score').text('Score: ' + player.getScore());
                                 item.randomize(canvas);
                             }
                         } else {
                             player.updateScore(item.getScore());
                             $('#score').text('Score: ' + player.getScore());
                             item.randomize(canvas);
+                        }
+                    }
+                    if (correctItems.has(item.getItem())){
+                        if (item.getScore() === 0) sounds.item.play();
+                        sounds.item.play();
+                        if (item.getItem() == 'candy'){ // implement candy item effect
+                            eatCandy = true; 
+                            setTimeout(resetEatCandy, 5000); 
+                        }
+                        if (item.getItem() == 'timer'){ // implement flake item effect
+                            console.log("touched the timer"); 
+                            timeLeft += 7; 
                         }
                     }
                     item.randomize(canvas);
@@ -180,11 +218,11 @@
                     $('#timer-box').removeClass('hidden');
                     $('#score-box').removeClass('hidden');
                     $('#game-area').show();
-                    startGame();
+                    requestAnimationFrame(doFrame);
                 }
             }, 1000);
         }
-
+        /*
         function startGame() {
             let timeLeft = JSON.parse(settings).time;
 
@@ -202,12 +240,11 @@
                 }
             }, 1000);
 
-            animationFrameId = requestAnimationFrame(doFrame);
-        }
+            requestAnimationFrame(doFrame);
+        }*/
 
         function endGame() {
-            cancelAnimationFrame(animationFrameId);
-
+            //cancelAnimationFrame(animationFrameId);
             sounds.background.pause();
             sounds.food.pause();
             sounds.hit.pause();
@@ -222,7 +259,7 @@
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
                 // Show results or other actions here
-            }, 2000);
+            }, 5000);
         }
 
     });
