@@ -9,7 +9,7 @@
 <body>
     <div id="container" class="col"> 
         <div id="game-lobby">
-            <div id="game-panel">Game Panel</div>
+            <div id="game-panel">Game Panel<button id="leave-lobby">Leave lobby</button></div>
             <div id="game-users">Game Users</div>
         </div>
     </div>
@@ -20,13 +20,23 @@
     <script src="/socket.io/socket.io.min.js"></script>
     <script src="../scripts/authentication.js"></script>
     <script src="../scripts/lobby.js"></script>
+    <script src="../scripts/socket.js"></script>
+
 
     <script>
-        Lobby.initialize('<%= code %>')
+        // Prevent going back
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+
+        Lobby.initialize('<%= code %>');
         Authentication.validate(
             () => {
-                Lobby.validate(
+                Socket.connect(() => {
+                    Lobby.validate(
                     () => {
+                        Socket.checkLeave(Lobby.getLobbyCode());
+                        Socket.checkEnter(Lobby.getLobbyCode());
                         UserPanel.initialize();
                     },
                     (err) => {
@@ -34,6 +44,8 @@
                         window.location.href = "/login"
                     }
                 );            
+                });
+                
             },
             () => {
                 console.log("No user");

@@ -97,6 +97,7 @@ app.get("/signout", (req, res) => {
 // Handle Websocket
 io.on("connection", (socket) => {
     // Add a new user to the online user list
+    console.log("Connected to websocket");
     const user = socket.request.session.user;
     if (user) {
         onlineUsers[user.username] = {avatar : user.avatar, name : user.name}; 

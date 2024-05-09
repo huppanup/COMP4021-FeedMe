@@ -157,13 +157,14 @@ app.get("/signout", (req, res) => {
 // Handle Websocket
 io.on("connection", (socket) => {
     const user = socket.request.session.user;
+    console.log(user?.id + " connected to socket");
 
     socket.on("enter lobby", (code) => {
         if (code in lobbies){
             if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
                 io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
             } else {
-                lobbies[code].players[user.id] = {"avatar" : "green"};
+                lobbies[code].players[user.id] = {color : "green"};
                 io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
             }
         } else {
@@ -171,10 +172,26 @@ io.on("connection", (socket) => {
         }  
     });
 
+    socket.on("leave lobby", (code) => {
+        console.log("Leaving lobby");
+        if (!lobbies[code]) return;
+        if (!lobbies[code].players[user.id]) return;
+
+        // Remove user from lobby
+        delete lobbies[code].players[user.id];
+        // Delete lobby if no users remain
+        if (Object.keys(lobbies[code].players).length == 0){
+            console.log("Lobby "+ code + " empty, removing...");
+            delete lobbies[code];
+        }
+        console.log(lobbies);
+        io.emit("left lobby " + code, user);
+
+    })
 
     socket.on("disconnect", () => {
-        const user = socket.request.session.user;
-        io.emit("remove user", JSON.stringify({id: user.id}));
+        console.log("Disconnecting socket...");
+        socket.disconnect();
     })
     
 });

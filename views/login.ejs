@@ -81,19 +81,21 @@
 
 
     <script>
+        // Prevent going back
+        function preventBack() { window.history.forward(); }
+        setTimeout("preventBack()", 0);
+        window.onunload = function () { null };
+
         $(function() {
             SignInForm.initialize();
             Authentication.validate(
                 () => {
-                    console.log("user exists");
-                    console.log(Authentication.getUser());
                     SignInForm.hide();
                     Socket.connect();
                     LobbyForm.show(); 
                     UserPanel.show(Authentication.getUser().id);               
                 },
                 () => {
-                    console.log("No user");
                     SignInForm.show();
                 }
             );
