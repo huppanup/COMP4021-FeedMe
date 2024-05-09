@@ -1,16 +1,22 @@
 const Lobby = (function() { 
     let lobby_code = null;
-    const initialize = function(code){ lobby_code = code; console.log(lobby_code);}
+    const initialize = function(code){ 
+        lobby_code = code;
+        $("#leave-lobby").on('click', (e) => {
+            e.preventDefault();
+            Socket.leaveLobby(code);
+        });
+    }
 
     const getLobbyCode = function(){ return lobby_code; }
 
+
     const validate = function(onSuccess, onError){
-        let code = JSON.stringify({code:Lobby.getLobbyCode()});
+        let code = JSON.stringify({code: Lobby.getLobbyCode()});
         fetch("/validate_lobby", { method : "POST", headers : { "Content-Type": "application/json" }, body : code})
         .then((res) => res.json() )
         .then((json) => {
             if (json.status == "success") {
-                lobby_code = json.lobby_code; 
                 onSuccess();
             } else {
                 onError(json.error);
@@ -27,7 +33,6 @@ const Lobby = (function() {
 const UserPanel = (function() {
     // This function initializes the UI
     const initialize = function() {
-        console.log("Initialize user panel");
         $("#user-name").text("Welcome, " + Authentication.getUser().id);
     };
 

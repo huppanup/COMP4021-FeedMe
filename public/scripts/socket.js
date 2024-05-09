@@ -8,27 +8,24 @@ const Socket = (function() {
     };
 
     // This function connects the server and initializes the socket
-    const connect = function() {
+    const connect = function(callback = () => {}) {
         socket = io();
 
         // Wait for the socket to connect successfully
         socket.on("connect", () => {
-            console.log("Connected");
-        });
-
-        // Set up the remove user event
-        socket.on("remove user", (user) => {
-            console.log("Socket : Remove user")
-            user = JSON.parse(user);
+            window.addEventListener('beforeunload', function() {
+                // Emit the "handle end" event before disconnecting the socket
+                disconnect();
+            });
+            callback();
         });
     };
 
     const enterLobby = function(code) {
         if (socket && socket.connected) {
-            socket.once("entered lobby " + LobbyForm.getLobbyCode(), (response) => {
+            socket.on("entered lobby " + code, (response) => {
                 if (response.status == 'success'){
                     if (response.user.id == Authentication.getUser().id) window.location.href = "/lobby/" + response.code;
-                    else console.log("User " + response.user.id + " has entered lobby.");
                 } else {
                     if (response.user.id == Authentication.getUser().id){
                         LobbyForm.showError(response.message);
@@ -36,17 +33,46 @@ const Socket = (function() {
                     }
                 }
             });
-     
             socket.emit("enter lobby", code);
         }
     }
 
+    const checkLeave = function(code){
+        if (socket && socket.connected) {
+            socket.on("left lobby " + code, (user) => {
+                if (user.id == Authentication.getUser().id) {window.location.href = "/"}
+                else {console.log("User " + user.id + " has left the lobby.")};
+            });
+        }
+    }
+
+    const checkEnter = function(code){
+        if (socket && socket.connected) {
+            socket.on("entered lobby " + code, (response) => {
+                if (response.status == 'success'){
+                    if (response.user.id == Authentication.getUser().id) console.log("You've entered the lobby!");
+                    else console.log("User " + response.user.id + " has entered lobby.");
+                }
+            });
+        }
+    }
+
+    const leaveLobby = function(code) {
+        if (socket && socket.connected) {
+            socket.emit("leave lobby", code);
+        }
+    }
+
+
+
     // This function disconnects the socket from the server
     const disconnect = function() {
-        console.log("Disconnected socket")
+        try{
+            leaveLobby(Lobby.getLobbyCode());
+        } catch(e) {};
         socket.disconnect();
         socket = null;
     };
 
-    return { getSocket, connect, enterLobby, disconnect };
+    return { getSocket, connect, checkLeave, checkEnter, enterLobby, leaveLobby, disconnect };
 })();
