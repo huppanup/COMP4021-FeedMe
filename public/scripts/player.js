@@ -154,9 +154,9 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 
             /* Set the new position if it is within the game area */
             if (gameArea.isPointInBox(x, y))
-                console.log("x: ", x, "y: ", y)
+                //console.log("x: ", x, "y: ", y)
                 sprite.setXY(x, y);
-        }
+            }
 
         /* Update the sprite object */
         sprite.update(now);
