@@ -2,7 +2,8 @@
 
 :root {
     --background: url('../resources/background.png');
-    --caption-color: #FF8A00;
+    --primary-color: #FF8A00;
+    --secondary-color: #FFB800;
 
 }
 
@@ -11,8 +12,16 @@
     box-sizing: border-box;
 }
 
+.spacer-vline { 
+    border-left: 3px dotted var(--primary-color);
+    height: 400px;
+    width: 3px;
+    margin-left: -1.5px;
+    align-self: center;
+}
+
 body {
-    min-width:600px; min-height: 400px;
+    min-width:700px; min-height: 467px;
     height: 100vh;
     max-height: 100vh;
     padding: 0;
@@ -31,18 +40,84 @@ body {
 }
 
 #game-lobby{
-    background-color: red;
-    min-width:600px; min-height: 400px;
+    background-color: white;
+    border-radius: 25px;
+    border: 5px solid var(--primary-color);
+    box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.4); 
+    min-width:700px; min-height: 467px;
     max-width:900px; max-height: 600px;
     width:90vw; height:60vw;
     display: flex;
 
 }
+/* Game Panel */
+.col{
+    display: flex;
+    flex-direction: column;
+}
+
+.center{
+    align-items: center;
+    justify-content: center;
+}
 
 #game-panel{
     width: 25%;
-    border: solid;
+    gap: 20px;
+    padding: 40px 25px;
 }
+
+#lobby-settings{
+    color: var(--primary-color);
+    gap: 20px;
+    flex-grow: 1;
+}
+
+.settings-label{
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+.settings-component{
+    gap: 10px;
+    font-size: 16px;
+}
+
+#lobby-buttons{
+    gap: 10px;
+}
+
+#lobby-buttons button.primary {
+    width: 100%;
+    font-weight: bolder;
+    height: 50px;
+    font-size: 23px;
+    border: 2px solid white;
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0px 3px 0px 0px var(--secondary-color);
+    padding: 0 20px;
+    transition: 0.5s background;
+    cursor: pointer;
+}
+
+#lobby-buttons button.secondary {
+    width: 100%;
+    font-weight: bolder;
+    height: 37px;
+    font-size: 15px;
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    background-color: white;
+    color: var(--primary-color);
+    box-shadow: 0px 3px 0px 0px var(--secondary-color);
+    padding: 0 20px;
+    transition: 0.5s background;
+    cursor: pointer;
+}
+
+
 
 #game-users{
     width: 75%;
@@ -73,7 +148,7 @@ button#signout-button {
     align-items: center;
     gap:10px;
     font-weight: bold;
-    color: var(--caption-color);
+    color: var(--primary-color);
     height: 50px;
     border: none;
     border-radius: 30px;
@@ -82,5 +157,5 @@ button#signout-button {
     padding: 0 20px;
     white-space: nowrap;
     cursor: pointer;
-    box-shadow: 0px 0px 3px var(--caption-color);
+    box-shadow: 0px 0px 3px var(--primary-color);
 }

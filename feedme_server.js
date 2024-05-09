@@ -78,8 +78,10 @@ app.get('/lobby/:code?', (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login");
     }
-
-    res.render("lobby", {code: req.params.code});
+    if (!lobbies[req.params.code]) return res.redirect("/login");
+    const n_players = lobbies[req.params.code].settings.n_players;
+    const time = lobbies[req.params.code].settings.time 
+    res.render("lobby", {code: req.params.code, n_players: n_players, time: time });
 })
 
 // POST

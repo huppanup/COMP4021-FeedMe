@@ -1,7 +1,10 @@
 const Lobby = (function() { 
     let lobby_code = null;
-    const initialize = function(code){ 
+    let lobby_settings = null;
+    const initialize = function(code, n, time){ 
         lobby_code = code;
+        lobby_settings = {n_players:n, time:time};
+        GamePanel.initialize();
         $("#leave-lobby").on('click', (e) => {
             e.preventDefault();
             Socket.leaveLobby(code);
@@ -9,6 +12,8 @@ const Lobby = (function() {
     }
 
     const getLobbyCode = function(){ return lobby_code; }
+    const getLobbySettings = function(){ return lobby_settings; }
+
 
 
     const validate = function(onSuccess, onError){
@@ -27,7 +32,36 @@ const Lobby = (function() {
         });
     }
 
-    return { initialize, getLobbyCode, validate };
+    return { initialize, getLobbyCode, getLobbySettings, validate };
+})();
+
+const GamePanel = (function(){
+    const initialize = function() {
+        const lobby_settings = Lobby.getLobbySettings();
+
+        const lobbyCodeComponent = `
+        <div class="settings-component col">
+        <div class="settings-label">CODE</div>
+        <div class="settings-content col center">${Lobby.getLobbyCode()}</div>
+        </div>
+        `;
+        const nPlayerComponent = `
+        <div class="settings-component col">
+        <div class="settings-label">NO. PLAYERS</div>
+        <div class="settings-content col center">${lobby_settings.n_players}</div>
+        </div>
+        `;
+        const timeComponent = `
+        <div class="settings-component col">
+        <div class="settings-label">TIME LIMIT</div>
+        <div class="settings-content col center">${lobby_settings.time} S</div>
+        </div>
+        `;
+
+        $("#lobby-settings").append(lobbyCodeComponent, nPlayerComponent, timeComponent);
+    };
+
+    return {initialize}
 })();
 
 const UserPanel = (function() {

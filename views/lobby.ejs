@@ -4,12 +4,22 @@
 <title>Feed Me!</title>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <link href="../stylesheets/lobby.css" rel="stylesheet">
+<link rel="icon" href="../resources/page_icon.png">
+
 </head>
 
 <body>
     <div id="container" class="col"> 
         <div id="game-lobby">
-            <div id="game-panel">Game Panel<button id="leave-lobby">Leave lobby</button></div>
+            <div id="game-panel" class="col">
+                <div id="lobby-settings" class="col center"></div>
+                <div id="lobby-buttons" class="col center">
+                    <button id="howto" class="secondary">GUIDE</button>
+                    <button id="leave-lobby" class="secondary">LEAVE</button>
+                    <button id="ready" class="primary">READY</button>
+                </div>
+            </div>
+            <div class="spacer-vline"></div>
             <div id="game-users">Game Users</div>
         </div>
     </div>
@@ -29,7 +39,7 @@
         setTimeout("preventBack()", 0);
         window.onunload = function () { null };
 
-        Lobby.initialize('<%= code %>');
+        Lobby.initialize('<%= code %>', '<%= n_players %>', '<%= time %>');
         Authentication.validate(
             () => {
                 Socket.connect(() => {
