@@ -1,115 +1,48 @@
-// const socket = io();
-//
-// const gameCanvas = document.getElementById('game-area');
-// const ctx = gameCanvas.getContext('2d');
-// const playerScoreElement = document.getElementById('player-score');
-// const targetScoreElement = document.getElementById('target-score');
-// const inventoryElements = [document.getElementById('item1'), document.getElementById('item2')];
-// const gameOverScreen = document.getElementById('game-over');
-// const winnerMessage = document.getElementById('winner-message');
-// const restartButton = document.getElementById('restart-button');
-//
-// const targetScore = 50; // Set the target score
-// let playerScore = 0;
-// let player = { x: 400, y: 300, size: 20, speed: 5 };
-// let foods = [];
-// let items = [];
-// let obstacles = [];
-// let inventory = [null, null];
-// let isGameOver = false;
-//
-// // Initial Setup
-// targetScoreElement.textContent = targetScore;
-// playerScoreElement.textContent = playerScore;
-//
-// // Generate Food
-// function generateFood() {
-//     return {
-//         x: Math.random() * (gameCanvas.width - 20),
-//         y: Math.random() * (gameCanvas.height - 20),
-//         size: 10,
-//         points: Math.random() > 0.2 ? 10 : -10
-//     };
-// }
-//
-// // Generate Items
-// function generateItem() {
-//     return {
-//         x: Math.random() * (gameCanvas.width - 20),
-//         y: Math.random() * (gameCanvas.height - 20),
-//         size: 15,
-//         effect: Math.random() > 0.5 ? 'boost' : 'disrupt'
-//     };
-// }
-//
-// // Generate Obstacles
-// function generateObstacle() {
-//     return {
-//         x: Math.random() * (gameCanvas.width - 20),
-//         y: Math.random() * (gameCanvas.height - 20),
-//         size: 20,
-//         points: -15
-//     };
-// }
-//
-// // Initialize Objects
-// function initializeObjects() {
-//     foods = Array.from({ length: 10 }, generateFood);
-//     items = Array.from({ length: 5 }, generateItem);
-//     obstacles = Array.from({ length: 5 }, generateObstacle);
-// }
-//
-// initializeObjects();
-//
-// // Drawing Functions
-// function drawBlob() {
-//     ctx.fillStyle = 'blue';
-//     ctx.beginPath();
-//     ctx.arc(player.x, player.y, player.size, 0, Math.PI * 2);
-//     ctx.fill();
-//     ctx.closePath();
-// }
-//
-// function drawFood(food) {
-//     ctx.fillStyle = food.points > 0 ? 'green' : 'red';
-//     ctx.beginPath();
-//     ctx.arc(food.x, food.y, food.size, 0, Math.PI * 2);
-//     ctx.fill();
-//     ctx.closePath();
-// }
-//
-// function drawItem(item) {
-//     ctx.fillStyle = item.effect === 'boost' ? 'gold' : 'purple';
-//     ctx.beginPath();
-//     ctx.arc(item.x, item.y, item.size, 0, Math.PI * 2);
-//     ctx.fill();
-//     ctx.closePath();
-// }
-//
-// function drawObstacle(obstacle) {
-//     ctx.fillStyle = 'black';
-//     ctx.beginPath();
-//     ctx.arc(obstacle.x, obstacle.y, obstacle.size, 0, Math.PI * 2);
-//     ctx.fill();
-//     ctx.closePath();
-// }
-//
-// function drawAll() {
-//     ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-//     drawBlob();
-//     foods.forEach(drawFood);
-//     items.forEach(drawItem);
-//     obstacles.forEach(drawObstacle);
-// }
-//
-// // Game Logic
-// function checkCollision(entity1, entity2) {
-//     const dx = entity1.x - entity2.x;
-//     const dy = entity1.y - entity2.y;
-//     const distance = Math.sqrt(dx * dx + dy * dy);
-//     return distance < entity1.size + entity2.size;
-// }
-//
+// Generate Players
+function createPlayers(playersData, ctx, gameArea) {
+    let players = [];
+    let playerIds = Object.keys(playersData);
+    for (let i = 0; i < playerIds.length; i++) {
+        let playerId = playerIds[i];
+        let playerColor = playersData[playerId].color;
+
+        // starting position of the players will be randomized
+        let playerX = Math.floor(Math.random() * gameArea.width);
+        let playerY = Math.floor(Math.random() * gameArea.height);
+        players.push(Player(ctx, playerX, playerY, gameArea, playerColor, playerId));
+    }
+    return players;
+}
+
+// Generate Items
+function createItems(ctx, canvas) {
+    let items = [];
+
+    items.push(
+        Item(ctx, canvas, "candy"),
+        Item(ctx, canvas, "glass"),
+        Item(ctx, canvas, "timer"),
+        Item(ctx, canvas, "flask"),
+        Item(ctx, canvas, "party"),
+        Item(ctx, canvas, "cake"),
+        Item(ctx, canvas, "cherry"),
+        Item(ctx, canvas, "melon"),
+        Item(ctx, canvas, "orange"),
+        Item(ctx, canvas, "banana"),
+        Item(ctx, canvas, "poo"),
+        Item(ctx, canvas, "sign")
+    );
+    return items;
+}
+
+// Game Logic
+function checkCollision(entity1, entity2) {
+    const dx = entity1.x - entity2.x;
+    const dy = entity1.y - entity2.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance < entity1.size + entity2.size;
+}
+
 // function handleMovement() {
 //     if (keys.ArrowUp) player.y -= player.speed;
 //     if (keys.ArrowDown) player.y += player.speed;

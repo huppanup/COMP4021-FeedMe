@@ -51,6 +51,7 @@
     <script src="/scripts/sprite.js"></script>
     <script src="/scripts/item.js"></script>
     <script src="/scripts/player.js"></script>
+    <script src="/scripts/game.js"></script>
     
 
     <script>
@@ -69,55 +70,14 @@
         gameAreaCanvas.attr('width', container.width());
         gameAreaCanvas.attr('height', container.height());
 
-        const totalGameTime = 20;   // Total game time in seconds
-        let gameStartTime = 0;      // The timestamp when the game starts
-        let currentUserScore = 60;  // Current user's score
-
         /* Create the items */
-        let items = [];
+        let items = []
+        items = createItems(ctx, canvas)
 
         /* Create Players */
+        let players = []
         const gameArea = BoundingBox(ctx, 0, 0, gameAreaCanvas.width, gameAreaCanvas.height);
-
-        let players = [];
-        let playerIds = Object.keys(JSON.parse(playersData));
-        //console.log(playerIds)
-        let gameTime = JSON.parse(settings).time
-        //console.log("gameTime: ", gameTime)
-
-        for (let i = 0; i < playerIds; i++) {
-            let playerId = playerIds[i];
-            console.log("playerId: ", playerId)
-
-            let playerColor = playersData[playerId].color;
-            console.log("playerColor: ", playerColor)
-
-            // starting position of the players will be randomized
-            let playerX = Math.floor(Math.random() * gameAreaCanvas.width);
-            let playerY = Math.floor(Math.random() * gameAreaCanvas.height);
-
-            players.push(Player(ctx, playerX, playerY, gameArea, playerColor, playerId));
-        }
-
-
-        /* Create the item sprites in the game */
-        function createItems(ctx, canvas) {
-            return [
-                Item(ctx, canvas, "candy"),
-                Item(ctx, canvas, "glass"),
-                Item(ctx, canvas, "timer"),
-                Item(ctx, canvas, "flask"),
-                Item(ctx, canvas, "party"),
-                Item(ctx, canvas, "cake"),
-                Item(ctx, canvas, "cherry"),
-                Item(ctx, canvas, "melon"),
-                Item(ctx, canvas, "orange"),
-                Item(ctx, canvas, "banana"),
-                Item(ctx, canvas, "poo"),
-                Item(ctx, canvas, "sign"),
-            ];
-        }
-        items.push(...createItems(ctx, canvas));
+        players = createPlayers(JSON.parse(playersData), ctx, gameArea);
 
         /* Main processing of the game */
         function doFrame(now) {
@@ -146,15 +106,24 @@
             }
 
             // Update the player;
-            // playerOne.update(now);
-            // playerOne.draw();
+            for (let player of players) {
+                player.update(now);
+                player.draw();
+            }
 
-            // playerTwo.update(now);
-            // playerTwo.draw();
-      
+            // Collection detection
+            items = items.filter(item => {
+                for (let player of players) {
+                    if (checkCollision(player, item)) {
+                        player.score += item.score;
+                        return false;
+                    }
+                }
+                return true;
+            })
+
             requestAnimationFrame(doFrame);
         }
-
 
 
         $(document).ready(function () {
@@ -237,85 +206,85 @@
         /* Check if the player ID matches the current user's ID */
         //if (player.id === currentUserID)
         // Keep track of keys currently pressed down
-        let keysDown = {};
-
-        // Add keydown event listener
-        $(document).on("keydown", function(event) {
-            // Add key to keysDown object if it's an arrow key
-            if (event.keyCode >= 37 && event.keyCode <= 40) {
-                keysDown[event.keyCode] = true;
-            }
-
-            // Check for diagonal movement
-            if (keysDown[37] && keysDown[38]) { // Up-Left
-                playerOne.move(5);
-            } else if (keysDown[38] && keysDown[39]) { // Up-Right
-                playerOne.move(6);
-            } else if (keysDown[39] && keysDown[40]) { // Down-Right
-                playerOne.move(8);
-            } else if (keysDown[40] && keysDown[37]) { // Down-Left
-                playerOne.move(7);
-            } else {
-                // Handle non-diagonal movement
-                switch (event.keyCode) {
-                    case 37: // Left
-                        playerOne.move(1);
-                        break;
-                    case 38: // Up
-                        playerOne.move(2);
-                        break;
-                    case 39: // Right
-                        playerOne.move(3);
-                        break;
-                    case 40: // Down
-                        playerOne.move(4);
-                        break;
-                }
-            }
-        });
+        // let keysDown = {};
+        //
+        // // Add keydown event listener
+        // $(document).on("keydown", function(event) {
+        //     // Add key to keysDown object if it's an arrow key
+        //     if (event.keyCode >= 37 && event.keyCode <= 40) {
+        //         keysDown[event.keyCode] = true;
+        //     }
+        //
+        //     // Check for diagonal movement
+        //     if (keysDown[37] && keysDown[38]) { // Up-Left
+        //         playerOne.move(5);
+        //     } else if (keysDown[38] && keysDown[39]) { // Up-Right
+        //         playerOne.move(6);
+        //     } else if (keysDown[39] && keysDown[40]) { // Down-Right
+        //         playerOne.move(8);
+        //     } else if (keysDown[40] && keysDown[37]) { // Down-Left
+        //         playerOne.move(7);
+        //     } else {
+        //         // Handle non-diagonal movement
+        //         switch (event.keyCode) {
+        //             case 37: // Left
+        //                 playerOne.move(1);
+        //                 break;
+        //             case 38: // Up
+        //                 playerOne.move(2);
+        //                 break;
+        //             case 39: // Right
+        //                 playerOne.move(3);
+        //                 break;
+        //             case 40: // Down
+        //                 playerOne.move(4);
+        //                 break;
+        //         }
+        //     }
+        // });
 
                 // Add keyup event listener
-        $(document).on("keyup", function(event) {
-            // Remove key from keysDown object if it's an arrow key
-            if (event.keyCode >= 37 && event.keyCode <= 40) {
-                delete keysDown[event.keyCode];
-            }
-
-            // Check for diagonal movement
-            if (keysDown[37] && keysDown[38]) { // Up-Left
-                playerOne.move(5);
-            } else if (keysDown[38] && keysDown[39]) { // Up-Right
-                playerOne.move(6);
-            } else if (keysDown[39] && keysDown[40]) { // Down-Right
-                playerOne.move(7);
-            } else if (keysDown[40] && keysDown[37]) { // Down-Left
-                playerOne.move(8);
-            } else {
-                // Handle non-diagonal movement
-                switch (event.keyCode) {
-                    case 37: // Left
-                        if (!keysDown[37]) playerOne.stop(1);
-                        if (keysDown[38]) playerOne.move(2);
-                        if (keysDown[40]) playerOne.move(4);
-                        break;
-                    case 38: // Up
-                        if (!keysDown[38]) playerOne.stop(2);
-                        if (keysDown[37]) playerOne.move(1);
-                        if (keysDown[39]) playerOne.move(3);
-                        break;
-                    case 39: // Right
-                        if (!keysDown[39]) playerOne.stop(3);
-                        if (keysDown[38]) playerOne.move(2);
-                        if (keysDown[40]) playerOne.move(4);
-                        break;
-                    case 40: // Down
-                        if (!keysDown[40]) playerOne.stop(4);
-                        if (keysDown[37]) playerOne.move(1);
-                        if (keysDown[39]) playerOne.move(3);
-                        break;
-                }
-            }
-        });
+        // $(document).on("keyup", function(event) {
+        //     // Remove key from keysDown object if it's an arrow key
+        //     if (event.keyCode >= 37 && event.keyCode <= 40) {
+        //         delete keysDown[event.keyCode];
+        //     }
+        //
+        //     // Check for diagonal movement
+        //     if (keysDown[37] && keysDown[38]) { // Up-Left
+        //         playerOne.move(5);
+        //     } else if (keysDown[38] && keysDown[39]) { // Up-Right
+        //         playerOne.move(6);
+        //     } else if (keysDown[39] && keysDown[40]) { // Down-Right
+        //         playerOne.move(7);
+        //     } else if (keysDown[40] && keysDown[37]) { // Down-Left
+        //         playerOne.move(8);
+        //     } else {
+        //         // Handle non-diagonal movement
+        //         switch (event.keyCode) {
+        //             case 37: // Left
+        //                 if (!keysDown[37]) playerOne.stop(1);
+        //                 if (keysDown[38]) playerOne.move(2);
+        //                 if (keysDown[40]) playerOne.move(4);
+        //                 break;
+        //             case 38: // Up
+        //                 if (!keysDown[38]) playerOne.stop(2);
+        //                 if (keysDown[37]) playerOne.move(1);
+        //                 if (keysDown[39]) playerOne.move(3);
+        //                 break;
+        //             case 39: // Right
+        //                 if (!keysDown[39]) playerOne.stop(3);
+        //                 if (keysDown[38]) playerOne.move(2);
+        //                 if (keysDown[40]) playerOne.move(4);
+        //                 break;
+        //             case 40: // Down
+        //                 if (!keysDown[40]) playerOne.stop(4);
+        //                 if (keysDown[37]) playerOne.move(1);
+        //                 if (keysDown[39]) playerOne.move(3);
+        //                 break;
+        //         }
+        //     }
+        // });
     }); 
     </script>
 </body>
