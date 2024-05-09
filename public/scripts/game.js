@@ -1,17 +1,14 @@
-// Generate Players
-function createPlayers(playersData, ctx, gameArea) {
-    let players = [];
-    let playerIds = Object.keys(playersData);
-    for (let i = 0; i < playerIds.length; i++) {
-        let playerId = playerIds[i];
-        let playerColor = playersData[playerId].color;
 
-        // starting position of the players will be randomized
-        let playerX = Math.floor(Math.random() * gameArea.width);
-        let playerY = Math.floor(Math.random() * gameArea.height);
-        players.push(Player(ctx, playerX, playerY, gameArea, playerColor, playerId));
-    }
-    return players;
+// Generate Players
+function createPlayers(playersData, ctx, canvas) {
+    const gameArea = BoundingBox(ctx, 0, 0, canvas.width, canvas.height);
+    let playerId = Object.keys(playersData);
+    let playerColor = playersData[playerId].color;
+
+    // starting position of the player will be randomized
+    let playerX = Math.floor(Math.random() * canvas.width);
+    let playerY = Math.floor(Math.random() * canvas.height);
+    return Player(ctx, playerX, playerY, gameArea, playerColor, playerId);
 }
 
 // Generate Items

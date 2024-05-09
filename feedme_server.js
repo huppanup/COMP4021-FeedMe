@@ -77,7 +77,7 @@ app.get('/game', (req, res) => {
     //dummy
     lobbies["1234"] = {
         "settings" : {"n_players" : 2, "time" : 30 },
-        "players" : {"id1" : {"color" : "green"}, "id2" : {"color" : "blue"}}}
+        "players" : {"id1" : {"color" : "green"}}}
 
     // Find the lobby that the user is in
     for (const [code, lobby] of Object.entries(lobbies)) {
