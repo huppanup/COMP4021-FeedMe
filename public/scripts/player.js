@@ -69,6 +69,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 
     // This is the moving speed (pixels per second) of the player
     let speed = 250;
+    const originalSpeed = speed;
 
     /*
     // This function sets the player's moving direction.
@@ -137,13 +138,17 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 };
     // This function speeds up the player.
     const speedUp = function() {
-        speed = 400;
+        speed *= 2;
     };
 
     // This function slows down the player.
     const slowDown = function() {
-        speed = 250;
+        speed *= 0.5;
     };
+
+    const normalSpeed = function() {
+        speed = originalSpeed;
+    }
 
     // This function updates the player depending on his movement.
     // - `time` - The timestamp when this function is called
@@ -196,6 +201,10 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         score += newScore;
     }
 
+    const getSpeed = function(){
+        return speed;
+    }
+
     // The methods are returned as an object here.
     return {
         playerID: playerID,
@@ -209,6 +218,8 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         getY: getY,
         update: update,
         getScore: getScore,
-        updateScore: updateScore
+        updateScore: updateScore,
+        normalSpeed: normalSpeed,
+        getSpeed: getSpeed
     };
 };

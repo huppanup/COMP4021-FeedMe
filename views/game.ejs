@@ -16,6 +16,7 @@
             <h1 id="countdown">Game Start!</h1>
         </div>
 
+
         <!-- Game Over Text -->
         <div id="game-over" class="center end-text hidden">
             <h1>Game Over</h1>
@@ -49,7 +50,7 @@
             <span id="score">Score: 0</span>
         </div>
     </div>
-    <div id="signin-overlay" class="overlay row"></div>
+    <div id="signin-overlay" class="overlay row"> </div>
 
     <script src="/scripts/boundingBox.js"></script>
     <script src="/scripts/sprite.js"></script>
@@ -92,11 +93,58 @@
         // Handle keydown/up events
         handleKeyDownUp(player);
 
+        // Set for timeLeft
+        //let timeLeft = JSON.parse(settings).time;
+        let timeLeft = 100;
+        let gameStartTime = 0;      // The timestamp when the game starts
+
         // Set of correct item types
-        const correctItems = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
+        const correctFruits = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
+        const correctItems = new Set(['candy', 'glass', 'timer', 'flake','party']);
+
+        // Candy effect
+        let eatCandy = false;
+
+        // Sunglass effect
+        const rainbowColors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+        let colorChangeInterval;
+
+        function startColorChangeEffect() {
+            let colorIndex = 0;
+            colorChangeInterval = setInterval(() => {
+                console.log("color changes: ", rainbowColors[colorIndex % rainbowColors.length])
+                $('body').css(
+                    {
+                        'background-color': rainbowColors[colorIndex % rainbowColors.length],
+                        'background-image': 'none'
+                    });
+                colorIndex++;
+            }, 100); // Change color every 100ms
+        }
+
+        function stopColorChangeEffect() {
+            clearInterval(colorChangeInterval);
+            $('body').css({
+                'background-color': '',
+                'background-image': 'url("../resources/game.png")'
+            });
+        }
 
         /* Main processing of the game */
         function doFrame(now) {
+            if (gameStartTime === 0) gameStartTime = now;
+            /* Update the time remaining */
+            const gameTimeSoFar = now - gameStartTime;
+            const timeRemaining = Math.ceil((timeLeft * 1000 - gameTimeSoFar) / 1000);
+            $('#timer').text('Time: ' + timeRemaining);
+
+            if(timeRemaining <= 0)  {
+                clearInterval(doFrame);
+                endGame();
+                return;
+            }
+            // Play Background Music
+            sounds.background.play();
             // Update the canvas size dynamically
             canvas.width = container.width();
             canvas.height = container.height();
@@ -118,23 +166,83 @@
             // Collision detection
             for (let item of items) {
                 if (checkCollision(player, item)) {
-                    console.log(item.getItem())
-                    if (correctItems.has(item.getItem())) {
-                        if (item.getScore() < 0) sounds.hit.play();
-                        if (item.getScore() > 0) sounds.food.play();
-                        if (item.getScore() === 0) sounds.item.play();
+                    console.log("item: ", item.getItem())
 
-                        const temp = checkCheat();
-                        if (temp){
-                            if (item.getScore() < 0){
-                                item.randomize(canvas);
+                    // Fruits
+                    if (correctFruits.has(item.getItem()) && (item.getScore() !== 0)) {
+                        let itemScore = item.getScore();
+
+                        // Negative fruits
+                        if (item.getScore() < 0) {
+                            console.log("Candy state: ", eatCandy)
+                            if (eatCandy){
+                                console.log("Candy effect active, negative score ignored")
+                                itemScore = 0;
+                            } else {
+                                sounds.hit.play();
                             }
-                        } else {
-                            player.updateScore(item.getScore());
-                            $('#score').text('Score: ' + player.getScore());
-                            item.randomize(canvas);
+                        }
+
+                        // Positive fruits
+                        else if (item.getScore() > 0) {
+                            sounds.food.play();
+                        }
+
+                        player.updateScore(itemScore); // update score for all fruits
+                        $('#score').text('Score: ' + player.getScore());
+                        //item.randomize(canvas);
+                    }
+
+                    // Items
+                    if (correctItems.has(item.getItem()) && (item.getScore() === 0)) {
+                        sounds.item.play();
+
+                        // Candy effect: Removes negative effect for 5s
+                        if (item.getItem() === 'candy'){
+                            console.log("touched the candy");
+                            eatCandy = true;
+                            setTimeout(() => {
+                                eatCandy = false
+                                console.log("Candy effect ended")
+                            }, 5000);
+                        }
+
+                        // Timer effect: Adds 7s to the timer
+                        if (item.getItem() === 'timer') {
+                            console.log("touched the timer");
+                            timeLeft += 7;
+                        }
+
+                        // Party effect: Speeds up the player for 5s
+                        if (item.getItem() === 'party') {
+                            console.log("touched the party");
+                            player.speedUp();
+                            console.log("Player speed : ", player.getSpeed());
+                            setTimeout(() => {
+                                player.normalSpeed();
+                            }, 5000);
+                        }
+
+                        // Flake effect: Slows down the player for 5s
+                        if (item.getItem() === 'flake') {
+                            console.log("touched the flake");
+                            player.slowDown();
+                            console.log("Player speed: ", player.getSpeed());
+                            setTimeout(() => {
+                                player.normalSpeed();
+                            }, 5000);
+                        }
+
+                        // Sunglass effect: Makes the items messy for 5s
+                        if (item.getItem() === 'glass') {
+                            console.log("touched the glass");
+                            startColorChangeEffect();
+                            setTimeout(() => {
+                                stopColorChangeEffect();
+                            }, 10000);  //10 seconds
                         }
                     }
+
                     item.randomize(canvas);
 
                 }
@@ -181,34 +289,20 @@
                     $('#timer-box').removeClass('hidden');
                     $('#score-box').removeClass('hidden');
                     $('#game-area').show();
-                    startGame();
+                    try {
+                        sounds.background.play().catch((error) => {
+                            console.log("Audio play failed: ", error);
+                        });
+                    } catch (error) {
+                        console.log("Error playing background music: ", error);
+                    }
+                    requestAnimationFrame(doFrame);
                 }
             }, 1000);
-        }
-
-        function startGame() {
-            let timeLeft = JSON.parse(settings).time;
-
-            $('#timer').text('Time: ' + timeLeft);
-            // Play Background Music
-            sounds.background.play();
-
-            const gameInterval = setInterval(() => {
-                if (timeLeft <= 0) {
-                    clearInterval(gameInterval);
-                    endGame();
-                } else {
-                    timeLeft--;
-                    $('#timer').text('Time: ' + timeLeft);
-                }
-            }, 1000);
-
-            animationFrameId = requestAnimationFrame(doFrame);
         }
 
         function endGame() {
-            cancelAnimationFrame(animationFrameId);
-
+            //cancelAnimationFrame(animationFrameId);
             sounds.background.pause();
             sounds.food.pause();
             sounds.hit.pause();
@@ -223,7 +317,7 @@
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
                 // Show results or other actions here
-            }, 2000);
+            }, 5000);
         }
 
     });

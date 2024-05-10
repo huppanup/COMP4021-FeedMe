@@ -45,13 +45,11 @@ let cheatMode = false;
 
 function checkCheat(){
     if (cheatMode) {
-        // Code for cheat mode
+        // cheat mode
         console.log("Cheat mode activated");
-        // Add your cheat mode logic here
     } else {
-        // Code for normal mode
+        // normal mode
         console.log("Normal mode");
-        // Add your normal mode logic here
     }
     return cheatMode; 
 }
@@ -91,10 +89,10 @@ function handleKeyDownUp(player) {
                 case 40: // Down
                     player.move(4);
                     break;
-                case 16: // Shift
-                    cheatMode = true;  
-                    player.speedUp(); 
-                    break; 
+                // case 16: // Shift
+                //     cheatMode = true;
+                //     player.speedUp();
+                //     break;
             }
         }
     });
