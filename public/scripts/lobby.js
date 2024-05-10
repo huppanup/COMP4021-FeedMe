@@ -151,6 +151,7 @@ const PlayerPanel = (function(){
             </div>`);
             if (players[id].ready){
                 $(`.player-box:eq(${i})`).append(`<div class="ready player-content" >READY</div>`);
+                i++;
                 continue;
             }
             if (id == Authentication.getUser().id){
