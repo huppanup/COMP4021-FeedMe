@@ -15,6 +15,7 @@
             <h1 id="countdown">Game Start!</h1>
         </div>
 
+
         <!-- Game Over Text -->
         <div id="game-over" class="center end-text hidden">
             <h1>Game Over</h1>
@@ -48,7 +49,7 @@
             <span id="score">Score: 0</span>
         </div>
     </div>
-    <div id="signin-overlay" class="overlay row"></div>
+    <div id="signin-overlay" class="overlay row"> </div>
 
     <script src="/scripts/boundingBox.js"></script>
     <script src="/scripts/sprite.js"></script>
@@ -91,19 +92,21 @@
         // Handle keydown/up events
         handleKeyDownUp(player);
 
-        // Set for eatCandy 
-        let eatCandy = false; 
-
         // Set for timeLeft
-        let timeLeft = JSON.parse(settings).time; 
+        //let timeLeft = JSON.parse(settings).time;
+        let timeLeft = 100;
         let gameStartTime = 0;      // The timestamp when the game starts
 
         // Set of correct item types
         const correctFruits = new Set(['cake', 'cherry', 'melon', 'orange', 'banana', 'poo', 'sign']);
         const correctItems = new Set(['candy', 'glass', 'timer', 'flake','party']);
+
+        // Candy effect
+        let eatCandy = false;
+
         /* Main processing of the game */
         function doFrame(now) {
-            if (gameStartTime == 0) gameStartTime = now; 
+            if (gameStartTime === 0) gameStartTime = now;
             /* Update the time remaining */
             const gameTimeSoFar = now - gameStartTime;
             const timeRemaining = Math.ceil((timeLeft * 1000 - gameTimeSoFar) / 1000);
@@ -135,49 +138,79 @@
             player.draw();
 
             // let eatCandy false when 5s ends 
-            const resetEatCandy = () =>{eatCandy = false};
+            //const resetEatCandy = () =>{eatCandy = false};
+            //let eatCandy = false;
 
             // Collision detection
             for (let item of items) {
                 if (checkCollision(player, item)) {
-                    console.log(item.getItem())
-                    if (correctFruits.has(item.getItem())) {
-                        if (item.getScore() < 0) sounds.hit.play();
-                        if (item.getScore() > 0) sounds.food.play();
-                        const IsCheat = checkCheat();
-                        console.log("eatCandy:", eatCandy)
-                        if (IsCheat || eatCandy){
-                            if (item.getScore() < 0){
-                                item.randomize(canvas);
-                            } else { // allow update of score when isCheat and fruit score > 0
-                                player.updateScore(item.getScore());
-                                $('#score').text('Score: ' + player.getScore());
-                                item.randomize(canvas);
+                    console.log("item: ", item.getItem())
+
+                    // Fruits
+                    if (correctFruits.has(item.getItem()) && (item.getScore() !== 0)) {
+                        let itemScore = item.getScore();
+
+                        // Negative fruits
+                        if (item.getScore() < 0) {
+                            console.log("Candy state: ", eatCandy)
+                            if (eatCandy){
+                                console.log("Candy effect active, negative score ignored")
+                                itemScore = 0;
+                            } else {
+                                sounds.hit.play();
                             }
-                        } else {
-                            player.updateScore(item.getScore());
-                            $('#score').text('Score: ' + player.getScore());
-                            item.randomize(canvas);
                         }
+
+                        // Positive fruits
+                        else if (item.getScore() > 0) {
+                            sounds.food.play();
+                        }
+
+                        player.updateScore(itemScore); // update score for all fruits
+                        $('#score').text('Score: ' + player.getScore());
+                        //item.randomize(canvas);
                     }
-                    if (correctItems.has(item.getItem())){
-                        if (item.getScore() === 0) sounds.item.play();
+
+                    // Items
+                    if (correctItems.has(item.getItem()) && (item.getScore() === 0)) {
+                        //if (item.getScore() === 0) sounds.item.play();
                         sounds.item.play();
-                        if (item.getItem() == 'candy'){ // implement candy item effect
-                            eatCandy = true; 
-                            setTimeout(resetEatCandy, 5000); 
+                        if (item.getItem() === 'candy'){ // implement candy item effect
+                            console.log("touched the candy");
+                            eatCandy = true;
+                            console.log(eatCandy)
+                            setTimeout(() => {
+                                eatCandy = false
+                                console.log("Candy effect ended")
+                            }, 5000);
+
                         }
-                        if (item.getItem() == 'timer'){ // implement flake item effect
+                        if (item.getItem() === 'timer'){ // implement flake item effect
                             console.log("touched the timer"); 
                             timeLeft += 7; 
                         }
                     }
+
                     item.randomize(canvas);
 
                 }
             }
 
             requestAnimationFrame(doFrame);
+
+                          // if (IsCheat || eatCandy){
+                        //     if (item.getScore() < 0){
+                        //         item.randomize(canvas);
+                        //     } else { // allow update of score when isCheat and fruit score > 0
+                        //         player.updateScore(item.getScore());
+                        //         $('#score').text('Score: ' + player.getScore());
+                        //         item.randomize(canvas);
+                        //     }
+                        // } else {
+                        //     player.updateScore(item.getScore());
+                        //     $('#score').text('Score: ' + player.getScore());
+                        //     item.randomize(canvas);
+                        // }
         }
 
         $(document).ready(function () {
@@ -218,6 +251,13 @@
                     $('#timer-box').removeClass('hidden');
                     $('#score-box').removeClass('hidden');
                     $('#game-area').show();
+                    try {
+                        sounds.background.play().catch((error) => {
+                            console.log("Audio play failed: ", error);
+                        });
+                    } catch (error) {
+                        console.log("Error playing background music: ", error);
+                    }
                     requestAnimationFrame(doFrame);
                 }
             }, 1000);
