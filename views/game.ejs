@@ -74,8 +74,6 @@
         canvas.width = container.width();
         canvas.height = container.height();
 
-        let animationFrameId;
-
         const sounds = {
             background: new Audio("/resources/background.mp3"),
             food: new Audio("/resources/food.mp3"),
@@ -88,7 +86,8 @@
         let items = createItems(ctx, canvas);
 
         // Create Players
-        let player = createPlayers(JSON.parse(playersData), ctx, canvas);
+        let currentPlayer = JSON.parse(user);
+        let player = createPlayers(JSON.parse(playersData), currentPlayer, ctx, canvas);
 
         // Handle keydown/up events
         handleKeyDownUp(player);
