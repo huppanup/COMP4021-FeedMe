@@ -76,11 +76,10 @@ app.get('/game/:code?', (req, res) => {
         user : req.session.user,
         lobbyCode : req.params.code,
         settings : lobbies[req.params.code].settings,
-        playersData : lobbies[req.params.code].players
+        playersData : lobbies[req.params.code].players,
+        score: lobbies[req.params.code].players[req.session.user.id].score
     })
 });
-
-
 
 app.get('/lobby/:code?', (req, res) => {
     if (!req.session.user) {
@@ -203,18 +202,23 @@ io.on("connection", (socket) => {
         io.emit("updated lobby " + code, lobbies[code]);
     });
 
-    socket.on("update score", (code, score) => {
-        lobbies[code].players[user.id].score = score;
+     socket.on("update score", (lobbyCode, scoreChange) => {
+        if (lobbyCode in lobbies && user.id in lobbies[lobbyCode].players) {
+            // Update the player's score
+            lobbies[lobbyCode].players[user.id].score += scoreChange;
+            console.log("타나")
+            console.log(lobbies[lobbyCode].players[user.id].score)
 
-        let endGame = true;
-        for (id in lobbies[code].players){
-            if (lobbies[code].players[id].score == "") endGame = false;
+            io.to(lobbyCode).emit("updated scores " + lobbyCode, lobbies[lobbyCode].players);
         }
-        if (endGame){ io.emit("end game " + code);}
     });
 
-
-
+     socket.on("game over", (lobbyCode) => {
+        if (lobbyCode in lobbies) {
+            const players = lobbies[lobbyCode].players;
+            io.to(lobbyCode).emit("end game " + lobbyCode, players);
+        }
+    });
 
     socket.on("leave lobby", (code) => {
         if (!lobbies[code]) return;

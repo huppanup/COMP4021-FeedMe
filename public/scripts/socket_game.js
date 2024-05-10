@@ -8,21 +8,70 @@ const Socket = (function() {
     };
 
     // This function connects the server and initializes the socket
-    const connect = function(callback = () => {}) {
+    const connect = function(lobbyCode, user, callback = () => {}) {
         socket = io();
-        let code = /*TODO: Write a function to get the lobby code */ "temp";
+
+        // Join the lobby
+        socket.emit("enter lobby", lobbyCode);
 
         // Wait for the socket to connect successfully
         socket.on("connect", () => {
+            console.log("Connected to server");
+            callback();
         });
 
-        socket.on("end game " + code, () => {
-            // TODO: Executes when all users have ended their games for this lobby. Handle game end action here.
-        })
+        // updated scores event
+        socket.on("updated scores " + lobbyCode, (players) => {
+            updateResultsTable(players)
+        });
+
+        socket.on("end game " + lobbyCode, (players) => {
+            displayResults(players);
+            setTimeout(() => {
+                window.location.href = `/lobby/${lobbyCode}`;
+            }, 10000); // Redirect after 10 seconds
+        });
+    };
+
+    const displayResults = function(players) {
+        //$('#results-box').removeClass('hidden');
+        $('#game-over').removeClass('hidden');
+        $('#timer-box').addClass('hidden');
+        $('#score-box').addClass('hidden');
+        $('#game-area').hide();
+
+        const tbody = $('#results-table tbody');
+        tbody.empty();
+
+        let highestScore = -Infinity;
+        let winner = '';
+
+        Object.entries(players).forEach(([playerId, playerData]) => {
+            const row = `<tr><td>${playerId}</td><td>${playerData.score}</td></tr>`;
+            tbody.append(row);
+            if (playerData.score > highestScore) {
+                highestScore = playerData.score;
+                winner = playerId;
+            }
+        });
+
+        $('#winner-text').text(`Winner: ${winner}`);
     };
 
     const updateScore = function(lobbyCode, score) {
-        Socket.emit("update score", lobbyCode, score);
+        socket.emit("update score", lobbyCode, score);
+    };
+
+    // Update results table
+    const updateResultsTable = function(players) {
+        const tbody = $('#results-table tbody');
+        tbody.empty();
+
+        Object.entries(players).forEach(([playerId, playerData]) => {
+            console.log("player in results table: ", playerId)
+            const row = `<tr><td>${playerId}</td><td>${playerData.score}</td></tr>`;
+            tbody.append(row);
+        });
     };
 
 

@@ -22,24 +22,6 @@
             <h1>Game Over</h1>
         </div>
 
-        <!-- Results Table -->
-        <div id="results-box" class="center results-text hidden">
-            <h2>Results</h2>
-            <table id="results-table">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Results will be populated dynamically -->
-                </tbody>
-            </table>
-            <h3 id="winner-text">Winner: </h3>
-            <button id="restart-game">Restart</button>
-        </div>
-
         <!-- Timer -->
         <div id="timer-box" class="right-top timer-text hidden">
             <span id="timer">Time: 60</span>
@@ -49,7 +31,22 @@
         <div id="score-box" class="left-top score-text hidden">
             <span id="score">Score: 0</span>
         </div>
-    </div>
+
+        <!-- Scoreboard -->
+        <div id="scoreboard-box" class="right-top scoreboard-box hidden">
+                <table id="scoreboard">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     <div id="signin-overlay" class="overlay row"> </div>
 
     <script src="/scripts/boundingBox.js"></script>
@@ -57,13 +54,15 @@
     <script src="/scripts/item.js"></script>
     <script src="/scripts/player.js"></script>
     <script src="/scripts/game.js"></script>
+    <script src="/scripts/socket_game.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <script>
     const playersData = '<%- JSON.stringify(playersData) %>';
     const settings = '<%- JSON.stringify(settings) %>';
     const user = '<%- JSON.stringify(user) %>';
     const lobbyCode = '<%- JSON.stringify(lobbyCode) %>';
-
+    const score = '<%- JSON.stringify(score) %>';
     $(function() {
         /* Get the canvas and 2D context */
         const canvas = document.getElementById("game-area");
@@ -83,6 +82,17 @@
             gameover: new Audio("/resources/gameover.mp3")
         };
 
+        // socket connection
+        Socket.connect(lobbyCode, user, () => {
+            console.log("Connected to lobby: ", lobbyCode);
+        });
+
+        //update players score
+        function updatePlayerScore(scoreChange) {
+            Socket.updateScore(lobbyCode, scoreChange);
+            $('#score').text('Score: ' + player.getScore());
+        }
+
         // Create the items
         let items = createItems(ctx, canvas);
 
@@ -94,8 +104,8 @@
         handleKeyDownUp(player);
 
         // Set for timeLeft
-        let timeLeft = Math.ceil(JSON.parse(settings).time);
-        //let timeLeft = 100;
+        //let timeLeft = Math.ceil(JSON.parse(settings).time);
+        let timeLeft = 10;
         let gameStartTime = 0;      // The timestamp when the game starts
 
         // Set of correct item types
@@ -189,7 +199,8 @@
                         }
 
                         player.updateScore(itemScore); // update score for all fruits
-                        $('#score').text('Score: ' + player.getScore());
+                        updatePlayerScore(itemScore);   //via Socket.IO
+                        //$('#score').text('Score: ' + player.getScore());
                         //item.randomize(canvas);
                     }
 
@@ -254,7 +265,7 @@
         $(document).ready(function () {
             startCountdown();
             $('#restart-game').click(function () {
-                $('#results-box').addClass('hidden');
+                //$('#results-box').addClass('hidden');
                 $('#game-over').addClass('hidden');
                 $('#timer-box').removeClass('hidden');
                 $('#score-box').removeClass('hidden');
@@ -272,7 +283,7 @@
             $('#timer-box').addClass('hidden');
             $('#score-box').addClass('hidden');
             $('#game-over').addClass('hidden');
-            $('#results-box').addClass('hidden');
+            //$('#results-box').addClass('hidden');
             $('#game-area').hide();
 
             const countdownInterval = setInterval(() => {
@@ -313,6 +324,8 @@
             $('#timer-box').addClass('hidden');
             $('#score-box').addClass('hidden');
             $('#game-area').hide();
+
+            Socket.getSocket().emit('game over', lobbyCode);
 
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
