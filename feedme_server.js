@@ -70,38 +70,17 @@ app.get('/game/:code?', (req, res) => {
     if (!req.session.user) {
         return res.redirect("/login");
     }
+
     // You might want to send lobby info too, like below.
-    res.render("game", {user : req.session.user});
+    res.render("game", {
+        user : req.session.user,
+        lobbyCode : req.params.code,
+        settings : lobbies[req.params.code].settings,
+        playersData : lobbies[req.params.code].players
+    })
+});
 
-    }
 
-//     const user = req.session.user;
-//     let userLobby = null;
-
-//     //dummy
-//     lobbies["1234"] = {
-//         "settings" : {"n_players" : 2, "time" : 30 },
-//         "players" : {"id1" : {"color" : "green"}}}
-
-//     // Find the lobby that the user is in
-//     for (const [code, lobby] of Object.entries(lobbies)) {
-//         if (lobby.players) {
-//             userLobby = {code, ...lobby};
-//             break;
-//         }
-//     }
-
-//     if (!userLobby) {
-//         return res.redirect("/lobby");
-//     }
-
-//     res.render("game", {
-//         user: user,
-//         lobbyCode: userLobby.code,
-//         settings: userLobby.settings,
-//         playersData: userLobby.players
-//     });
-);
 
 app.get('/lobby/:code?', (req, res) => {
     if (!req.session.user) {
