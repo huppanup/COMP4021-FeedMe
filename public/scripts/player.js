@@ -46,6 +46,26 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             moveUpRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
             moveDownLeft: { x: 0, y: 384, width: 32, height: 32, count: 3, timing: 150, loop: true },
             moveDownRight: { x: 0, y: 448, width: 32, height: 32, count: 3, timing: 150, loop: true },
+        },
+        orange: {
+            idleLeft:  { x: 0, y: 640, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUp:    { x: 0, y: 576, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleRight: { x: 0, y: 704, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDown:  { x: 0, y: 768, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpLeft: { x: 0, y: 640, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleUpRight: { x: 0, y: 704, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownLeft: { x: 0, y: 640, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+            idleDownRight: { x: 0, y: 704, width: 32, height: 32, count: 3, timing: 2000, loop: false },
+
+            /* Moving sprite sequences for facing different directions */
+            moveLeft:  { x: 0, y: 640, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUp:    { x: 0, y: 576, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveRight: { x: 0, y: 704, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDown:  { x: 0, y: 768, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUpLeft: { x: 0, y: 640, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveUpRight: { x: 0, y: 704, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDownLeft: { x: 0, y: 640, width: 32, height: 32, count: 3, timing: 150, loop: true },
+            moveDownRight: { x: 0, y: 704, width: 32, height: 32, count: 3, timing: 150, loop: true },
         }
 
     };

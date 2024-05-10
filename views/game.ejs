@@ -27,7 +27,7 @@
             <table id="results-table">
                 <thead>
                     <tr>
-                        <th>User</th>
+                        <th>player</th>
                         <th>Score</th>
                     </tr>
                 </thead>
@@ -94,7 +94,7 @@
 
         // Set for timeLeft
         //let timeLeft = JSON.parse(settings).time;
-        let timeLeft = 100;
+        let timeLeft = 10;
         let gameStartTime = 0;      // The timestamp when the game starts
 
         // Set of correct item types
@@ -299,9 +299,10 @@
                 }
             }, 1000);
         }
-
+        
         function endGame() {
-            //cancelAnimationFrame(animationFrameId);
+            cancelAnimationFrame(animationFrameId);
+            stopColorChangeEffect()
             sounds.background.pause();
             sounds.food.pause();
             sounds.hit.pause();
@@ -313,9 +314,15 @@
             $('#score-box').addClass('hidden');
             $('#game-area').hide();
 
+            const userRow = '<tr><td>' + Object.keys(playersData)[0] + '</td><td>' + player.getScore() + '</td></tr>';
+            $('#results-table tbody').append(userRow);
+
+
             setTimeout(() => {
                 $('#game-over').addClass('hidden');
                 // Show results or other actions here
+                $('#results-box').removeClass('hidden');
+                
             }, 5000);
         }
 
