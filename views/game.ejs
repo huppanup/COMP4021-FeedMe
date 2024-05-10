@@ -104,6 +104,31 @@
         // Candy effect
         let eatCandy = false;
 
+        // Sunglass effect
+        const rainbowColors = ["red", "orange", "yellow", "green", "blue", "indigo", "violet"];
+        let colorChangeInterval;
+
+        function startColorChangeEffect() {
+            let colorIndex = 0;
+            colorChangeInterval = setInterval(() => {
+                console.log("color changes: ", rainbowColors[colorIndex % rainbowColors.length])
+                $('body').css(
+                    {
+                        'background-color': rainbowColors[colorIndex % rainbowColors.length],
+                        'background-image': 'none'
+                    });
+                colorIndex++;
+            }, 100); // Change color every 100ms
+        }
+
+        function stopColorChangeEffect() {
+            clearInterval(colorChangeInterval);
+            $('body').css({
+                'background-color': '',
+                'background-image': 'url("../resources/game.png")'
+            });
+        }
+
         /* Main processing of the game */
         function doFrame(now) {
             if (gameStartTime === 0) gameStartTime = now;
@@ -115,8 +140,8 @@
             if(timeRemaining <= 0)  {
                 clearInterval(doFrame);
                 endGame();
-                return; 
-            } 
+                return;
+            }
             // Play Background Music
             sounds.background.play();
             // Update the canvas size dynamically
@@ -136,10 +161,6 @@
             // Update the player
             player.update(now);
             player.draw();
-
-            // let eatCandy false when 5s ends 
-            //const resetEatCandy = () =>{eatCandy = false};
-            //let eatCandy = false;
 
             // Collision detection
             for (let item of items) {
@@ -173,21 +194,51 @@
 
                     // Items
                     if (correctItems.has(item.getItem()) && (item.getScore() === 0)) {
-                        //if (item.getScore() === 0) sounds.item.play();
                         sounds.item.play();
-                        if (item.getItem() === 'candy'){ // implement candy item effect
+
+                        // Candy effect: Removes negative effect for 5s
+                        if (item.getItem() === 'candy'){
                             console.log("touched the candy");
                             eatCandy = true;
-                            console.log(eatCandy)
                             setTimeout(() => {
                                 eatCandy = false
                                 console.log("Candy effect ended")
                             }, 5000);
-
                         }
-                        if (item.getItem() === 'timer'){ // implement flake item effect
-                            console.log("touched the timer"); 
-                            timeLeft += 7; 
+
+                        // Timer effect: Adds 7s to the timer
+                        if (item.getItem() === 'timer') {
+                            console.log("touched the timer");
+                            timeLeft += 7;
+                        }
+
+                        // Party effect: Speeds up the player for 5s
+                        if (item.getItem() === 'party') {
+                            console.log("touched the party");
+                            player.speedUp();
+                            console.log("Player speed : ", player.getSpeed());
+                            setTimeout(() => {
+                                player.normalSpeed();
+                            }, 5000);
+                        }
+
+                        // Flake effect: Slows down the player for 5s
+                        if (item.getItem() === 'flake') {
+                            console.log("touched the flake");
+                            player.slowDown();
+                            console.log("Player speed: ", player.getSpeed());
+                            setTimeout(() => {
+                                player.normalSpeed();
+                            }, 5000);
+                        }
+
+                        // Sunglass effect: Makes the items messy for 5s
+                        if (item.getItem() === 'glass') {
+                            console.log("touched the glass");
+                            startColorChangeEffect();
+                            setTimeout(() => {
+                                stopColorChangeEffect();
+                            }, 10000);  //10 seconds
                         }
                     }
 
@@ -197,20 +248,6 @@
             }
 
             requestAnimationFrame(doFrame);
-
-                          // if (IsCheat || eatCandy){
-                        //     if (item.getScore() < 0){
-                        //         item.randomize(canvas);
-                        //     } else { // allow update of score when isCheat and fruit score > 0
-                        //         player.updateScore(item.getScore());
-                        //         $('#score').text('Score: ' + player.getScore());
-                        //         item.randomize(canvas);
-                        //     }
-                        // } else {
-                        //     player.updateScore(item.getScore());
-                        //     $('#score').text('Score: ' + player.getScore());
-                        //     item.randomize(canvas);
-                        // }
         }
 
         $(document).ready(function () {
@@ -262,26 +299,6 @@
                 }
             }, 1000);
         }
-        /*
-        function startGame() {
-            let timeLeft = JSON.parse(settings).time;
-
-            $('#timer').text('Time: ' + timeLeft);
-            // Play Background Music
-            sounds.background.play();
-
-            const gameInterval = setInterval(() => {
-                if (timeLeft <= 0) {
-                    clearInterval(gameInterval);
-                    endGame();
-                } else {
-                    timeLeft--;
-                    $('#timer').text('Time: ' + timeLeft);
-                }
-            }, 1000);
-
-            requestAnimationFrame(doFrame);
-        }*/
 
         function endGame() {
             //cancelAnimationFrame(animationFrameId);
