@@ -149,7 +149,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
                 case 4: sprite.setSequence(playerSequences.idleDown); break;
                 case 5: sprite.setSequence(playerSequences.idleUpLeft); break;
                 case 6: sprite.setSequence(playerSequences.idleUpRight); break;
-                case 7: sprite.setSequence(playerSequences.idleDownleft); break;
+                case 7: sprite.setSequence(playerSequences.idleDownLeft); break;
                 case 8: sprite.setSequence(playerSequences.idleDownRight); break;
             }
             direction = 0;
