@@ -152,7 +152,7 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
 
     // This function updates the player depending on his movement.
     // - `time` - The timestamp when this function is called
-    const update = function(now) {
+    const update = function(now, canvas) {
     /* Update the player if the player is moving */
         if (direction != 0) {
             let { x, y } = sprite.getXY();
@@ -169,17 +169,20 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
                 case 8: x+= speed / 60; y += speed / 60; break;
             }
 
-            /* Set the new position if it is within the game area */
-            // const spriteSize = sprite.getBoundingBox();
-            // const spriteWidth = spriteSize.width;
-            // console.log("spriteWidth" + spriteWidth) //128
-            // const spriteHeight = spriteSize.height;
-            // console.log("spriteHeight" + spriteHeight) //128
-
-            if (gameArea.isPointInBox(x, y))
-                console.log(gameArea.isPointInBox(x, y))
-                sprite.setXY(x, y);
+            if (x < 32) {
+                x = 32;
             }
+            if (x > canvas.width - 32) {
+                x = canvas.width - 32;
+            }
+            if (y < 32) {
+                y = 32;
+            }
+            if (y > canvas.height - 32) {
+                y = canvas.height - 32;
+            }
+            sprite.setXY(x, y);
+
 
         /* Update the sprite object */
         sprite.update(now);

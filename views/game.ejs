@@ -94,8 +94,8 @@
         handleKeyDownUp(player);
 
         // Set for timeLeft
-        //let timeLeft = JSON.parse(settings).time;
-        let timeLeft = 100;
+        let timeLeft = Math.ceil(JSON.parse(settings).time);
+        //let timeLeft = 100;
         let gameStartTime = 0;      // The timestamp when the game starts
 
         // Set of correct item types
@@ -160,7 +160,7 @@
             }
 
             // Update the player
-            player.update(now);
+            player.update(now, canvas);
             player.draw();
 
             // Collision detection
