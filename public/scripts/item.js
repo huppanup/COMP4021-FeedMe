@@ -28,8 +28,6 @@ const Item = function (ctx, gameArea, item) {
         poo: { x: 34, y: 33.7, width: 34, height: 32, count: 1, timing: 150, loop: true, score: -100 },
         sign: { x: 68, y: 33.5, width: 34, height: 32, count: 1, timing: 150, loop: true, score: -50 },
 
-        // Indistinguishable items
-        generic: {}
     };
 
     // Initialize the sprite object with the sprite sheet
