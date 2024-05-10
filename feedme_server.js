@@ -138,7 +138,7 @@ app.post("/validate_lobby", (req, res) => {
 
     if (!(code in lobbies)) return res.json({status : "error", error : "Error : The lobby does not exist."});
     if (!(user.id in lobbies[code].players)) return res.json({status : "error", error : "Error : You are not in this lobby."})
-    
+
     return res.json({ status: "success"})
 });
 
@@ -150,7 +150,7 @@ app.get("/validate", (req, res) => {
     const user = req.session.user;
 
     if (!user) return res.json({status : "error", error : "Error : User validation failed"})
-    
+
     return res.json({ status: "success", user : user})
 });
 
@@ -173,13 +173,13 @@ io.on("connection", (socket) => {
             if (parseInt(lobbies[code].settings.n_players) <= Object.keys(lobbies[code].players).length){
                 io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} is already full.`});
             } else {
-                lobbies[code].players[user.id] = {color : "green", ready : false};
+                lobbies[code].players[user.id] = {color : "green", ready : false, score:""};
                 io.emit(`entered lobby ${code}`, {status: "success", user : user, code : code});
                 io.emit("updated lobby " + code, lobbies[code]);
             }
         } else {
             io.emit("entered lobby " + code, {status: "error", user: user, message : `Error : Lobby ${code} does not exist`});
-        }  
+        }
     });
 
     socket.on("ready", (code) => {
@@ -203,6 +203,19 @@ io.on("connection", (socket) => {
         io.emit("updated lobby " + code, lobbies[code]);
     });
 
+    socket.on("update score", (code, score) => {
+        lobbies[code].players[user.id].score = score;
+
+        let endGame = true;
+        for (id in lobbies[code].players){
+            if (lobbies[code].players[id].score == "") endGame = false;
+        }
+        if (endGame){ io.emit("end game " + code);}
+    });
+
+
+
+
     socket.on("leave lobby", (code) => {
         if (!lobbies[code]) return;
         if (!lobbies[code].players[user.id]) return;
@@ -225,7 +238,7 @@ io.on("connection", (socket) => {
         console.log("Disconnecting socket...");
         socket.disconnect();
     })
-    
+
 });
 
 
