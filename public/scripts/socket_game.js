@@ -1,6 +1,7 @@
 const Socket = (function() {
     // This stores the current Socket.IO socket
     let socket = null;
+    let lobbyCode = null;
 
     // This function gets the socket from the module
     const getSocket = function() {
@@ -10,7 +11,6 @@ const Socket = (function() {
     // This function connects the server and initializes the socket
     const connect = function(lobbyCode, user, callback = () => {}) {
         socket = io();
-
         // Join the lobby
         socket.emit("enter lobby", lobbyCode);
 
@@ -28,8 +28,8 @@ const Socket = (function() {
         socket.on("end game " + lobbyCode, (players) => {
             displayResults(players);
             setTimeout(() => {
-                window.location.href = `/lobby/${lobbyCode}`;
-            }, 10000); // Redirect after 10 seconds
+                window.location.href = `/login`;
+            }, 100); // Redirect after 10 seconds
         });
     };
 
@@ -59,6 +59,7 @@ const Socket = (function() {
     };
 
     const updateScore = function(lobbyCode, score) {
+        console.log("Update " + lobbyCode);
         socket.emit("update score", lobbyCode, score);
     };
 

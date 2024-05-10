@@ -206,17 +206,24 @@ io.on("connection", (socket) => {
         if (lobbyCode in lobbies && user.id in lobbies[lobbyCode].players) {
             // Update the player's score
             lobbies[lobbyCode].players[user.id].score += scoreChange;
-            console.log("타나")
-            console.log(lobbies[lobbyCode].players[user.id].score)
+            console.log("Score updated: " + lobbies[lobbyCode].players[user.id].score)
 
-            io.to(lobbyCode).emit("updated scores " + lobbyCode, lobbies[lobbyCode].players);
-        }
-    });
+            let endGame = true;
+            for (id in lobbies[lobbyCode].players){
+                //End game condition
+                if (lobbies[lobbyCode].players[id].score == "") {
+                    endGame = false;
+                    delete lobbies[lobbyCode]
+                }
+            }
+            if (endGame){
+                console.log("End game");
+                delete lobbies[lobbyCode]
+                io.emit("end game " + lobbyCode, lobbies[lobbyCode].players);
+            }
 
-     socket.on("game over", (lobbyCode) => {
-        if (lobbyCode in lobbies) {
-            const players = lobbies[lobbyCode].players;
-            io.to(lobbyCode).emit("end game " + lobbyCode, players);
+            else {io.to(lobbyCode).emit("updated scores " + lobbyCode, lobbies[lobbyCode].players)}
+
         }
     });
 
