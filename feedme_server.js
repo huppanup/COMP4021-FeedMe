@@ -101,8 +101,7 @@ app.get('/game/:code?', (req, res) => {
 //         settings: userLobby.settings,
 //         playersData: userLobby.players
 //     });
-
-})
+);
 
 app.get('/lobby/:code?', (req, res) => {
     if (!req.session.user) {
@@ -228,7 +227,9 @@ io.on("connection", (socket) => {
     socket.on("leave lobby", (code) => {
         if (!lobbies[code]) return;
         if (!lobbies[code].players[user.id]) return;
-
+        let gameStart = true;
+        for (id in lobbies[code].players){if (!lobbies[code].players[id].ready) gameStart = false;}
+        if (gameStart) return;
         // Remove user from lobby
         delete lobbies[code].players[user.id];
         // Delete lobby if no users remain
