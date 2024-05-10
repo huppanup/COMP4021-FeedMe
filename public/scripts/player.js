@@ -153,20 +153,40 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
     // This function updates the player depending on his movement.
     // - `time` - The timestamp when this function is called
     const update = function(now, canvas) {
-    /* Update the player if the player is moving */
+        /* Update the player if the player is moving */
         if (direction != 0) {
-            let { x, y } = sprite.getXY();
+            let {x, y} = sprite.getXY();
 
             /* Move the player */
             switch (direction) {
-                case 1: x -= speed / 60; break;
-                case 2: y -= speed / 60; break;
-                case 3: x += speed / 60; break;
-                case 4: y += speed / 60; break;
-                case 5: x -= speed / 60; y -= speed / 60;break;
-                case 6: x += speed / 60; y -= speed / 60; break;
-                case 7: x -= speed / 60; y += speed / 60; break;
-                case 8: x+= speed / 60; y += speed / 60; break;
+                case 1:
+                    x -= speed / 60;
+                    break;
+                case 2:
+                    y -= speed / 60;
+                    break;
+                case 3:
+                    x += speed / 60;
+                    break;
+                case 4:
+                    y += speed / 60;
+                    break;
+                case 5:
+                    x -= speed / 60;
+                    y -= speed / 60;
+                    break;
+                case 6:
+                    x += speed / 60;
+                    y -= speed / 60;
+                    break;
+                case 7:
+                    x -= speed / 60;
+                    y += speed / 60;
+                    break;
+                case 8:
+                    x += speed / 60;
+                    y += speed / 60;
+                    break;
             }
 
             if (x < 32) {
@@ -184,8 +204,9 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
             sprite.setXY(x, y);
 
 
-        /* Update the sprite object */
-        sprite.update(now);
+            /* Update the sprite object */
+            sprite.update(now);
+        }
     };
 
     const getX = function() {
@@ -225,4 +246,4 @@ const Player = function(ctx, x, y, gameArea, playerType, playerID) {
         normalSpeed: normalSpeed,
         getSpeed: getSpeed
     };
-};
+}
